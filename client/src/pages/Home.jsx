@@ -1,5 +1,5 @@
 import React from "react";
-import { HeroSection, FeaturedSection } from "../components";
+import { HeroSection, FeaturedSection, TrailersSection } from "../components";
 
 
 function Home() {
@@ -7,6 +7,7 @@ function Home() {
 		<>
             <HeroSection />
             <FeaturedSection />
+            <TrailersSection />
 		</>
 	);
 }
