@@ -6,25 +6,25 @@ import { Heart, PlayCircleIcon, StarIcon } from "lucide-react";
 import timeFormat from "../lib/timeFormat.js";
 
 function MovieDetails() {
-  const { id } = useParams();
-  const [show, setShow] = useState(null);
-  const navigate = useNavigate();
+	const { id } = useParams();
+	const [show, setShow] = useState(null);
+	const navigate = useNavigate();
 
-  const getShow = async () => {
-    const show = dummyShowsData.find(show => show._id === id);
-    if (show) {
-      setShow({
-        movie: show,
-        dateTime: dummyDateTimeData,
-      });
-    }
-  }
+	const getShow = async () => {
+		const show = dummyShowsData.find((show) => show._id === id);
+		if (show) {
+			setShow({
+				movie: show,
+				dateTime: dummyDateTimeData,
+			});
+		}
+	};
 
-  useEffect(() => {
-    getShow();
-  }, [ id ]);
+	useEffect(() => {
+		getShow();
+	}, [id]);
 
-  return show ? (
+	return show ? (
 		<div className="px-6 md:px-16 lg:px-40 pt-30 md:pt-50">
 			<div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
 				<img src={show.movie.poster_path} alt="movie poster" className="max-md:mx-auto rounded-xl h-104 max-w-70 object-cover" />
@@ -78,24 +78,25 @@ function MovieDetails() {
 
 			<p className="text-lg font-medium mt-20 mb-8">You May Also Like</p>
 			<div className="flex flex-wrap max-sm:justify-center gap-8">
-        {
-          dummyShowsData.slice(0, 4).map((movie, idx) => (
-            <MovieCard key={idx} movie={movie} />
-          ))
-        }
+				{dummyShowsData.slice(0, 4).map((movie, idx) => (
+					<MovieCard key={idx} movie={movie} />
+				))}
 			</div>
 			<div className="flex justify-center mt-20">
 				<button
-          onClick={() => { navigate("/movies");  scrollTo(0,0)}}
+					onClick={() => {
+						navigate("/movies");
+						scrollTo(0, 0);
+					}}
 					className="px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-md font-medium cursor-pointer"
 				>
 					Show More
 				</button>
 			</div>
 		</div>
-  ) : (
+	) : (
 		<Loading />
-  );
+	);
 }
 
 export default MovieDetails;
