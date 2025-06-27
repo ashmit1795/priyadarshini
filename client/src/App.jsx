@@ -11,7 +11,7 @@ import { Toaster } from "react-hot-toast"
 
 function App() {
 
-  const isAdminRoute = useLocation().pathname.startsWith("/admin");
+	const isAdminRoute = useLocation().pathname.startsWith("/admin");
 
 	return (
 		<>
