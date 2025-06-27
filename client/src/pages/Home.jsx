@@ -1,11 +1,12 @@
 import React from "react";
-import { HeroSection } from "../components";
+import { HeroSection, FeaturedSection } from "../components";
 
 
 function Home() {
 	return (
 		<>
-			<HeroSection />
+            <HeroSection />
+            <FeaturedSection />
 		</>
 	);
 }
