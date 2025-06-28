@@ -1,6 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 @import "tailwindcss";
 
+/* Re-enable hover for all elements, regardless of device/browser detection */
+@custom-variant hover (&:hover);
+
 @theme{
     --color-primary: #F84565;
     --color-primary-dull: #D63854;
@@ -19,4 +22,13 @@ body{
 
 .no-scrollbar{
     scrollbar-width: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button{
+    -webkit-appearance: none;
+}
+
+::-webkit-calendar-picker-indicator{
+    filter: invert(1);
 }
