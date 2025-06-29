@@ -15,4 +15,7 @@ connectDB().then(() => {
     })
 }).catch((error) => {
     serverDebug(`Error: ${error.message}`);
-})
+});
+
+// Export the app for Vercel
+export default app;
