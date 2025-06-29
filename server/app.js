@@ -23,3 +23,12 @@ app.use(cors());
 app.use(clerkMiddleware());
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
+
+// '/' route to check if the server is running
+app.get("/", (req, res) => {
+	res.send({
+		title: "Priyadarshini API",
+		description: "API for Priyadarshini, a movie ticket booking application.",
+		version: "1.0.0",
+	});
+});
