@@ -69,7 +69,7 @@ const getNowPlayingMovies = async (req, res) => {
             res.status(200).json({ movies, success: true,  message: "Serving cached data due to API failure"});
 		} catch (cacheErr) {
 			console.error("Cache read failed:", cacheErr.message);
-			res.status(500).json({ success: false, message: "TMDB API and cache both failed"});
+			res.status(500).json({ error: error.message, success: false, message: "TMDB API and cache both failed"});
 		}
 	}
 }
