@@ -4,4 +4,4 @@ config({
     path: `.env`
 })
 
-export const { MONGODB_URL, PORT } = process.env;
+export const { MONGODB_URL, PORT, TMDB_API_KEY } = process.env;
