@@ -16,7 +16,9 @@ axiosRetry(axios, {
 	},
 });
 
-const CACHE_FILE = path.resolve("cache/nowPlaying.json");
+const isProd = process.env.NODE_ENV === "production";
+const CACHE_DIR = isProd ? "/tmp" : path.join(process.cwd(), "cache");
+const CACHE_FILE = path.join(CACHE_DIR, "nowPlaying.json");
 
 const getNowPlayingMovies = async (req, res) => {
 	try {
@@ -55,12 +57,14 @@ const getNowPlayingMovies = async (req, res) => {
 
 		const filteredMovies = filterMoviesWithPosterAndBackdrop(combinedMovies);
 
-        // 🔐 Save to cache
-        fs.mkdirSync(path.dirname(CACHE_FILE), { recursive: true });
+		// 🔐 Save to cache
+		if (!fs.existsSync(CACHE_DIR)) {
+			fs.mkdirSync(CACHE_DIR, { recursive: true });
+		}		
         fs.writeFileSync(CACHE_FILE, JSON.stringify(filteredMovies, null, 2));
         
 		console.log(`Fetched ${filteredMovies.length} now playing movies.`);
-		res.json({ movies: filteredMovies, success: true });
+		res.json({ success: true, movies: filteredMovies });
 	} catch (error) {
 		console.error("Error fetching now playing movies:", error.message);
 		// 📁 Read from cache
@@ -69,13 +73,14 @@ const getNowPlayingMovies = async (req, res) => {
 			const movies = JSON.parse(cachedData);
 
 			console.log("Serving cached data due to API failure.");
-            res.status(200).json({ movies, success: true,  message: "Serving cached data due to API failure"});
+            res.status(200).json({ success: true, movies,  message: `Serving cached data due to API failure due to: ${error.message}` });
 		} catch (cacheErr) {
 			console.error("Cache read failed:", cacheErr.message);
-			res.status(500).json({ error: error.message, success: false, message: "TMDB API and cache both failed"});
+			res.status(500).json({ success: false, error: error.message, message: "TMDB API and cache both failed"});
 		}
 	}
 }
+
 
 export {getNowPlayingMovies}
 
