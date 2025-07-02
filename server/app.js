@@ -4,6 +4,7 @@ import cors from "cors";
 import { clerkMiddleware } from "@clerk/express";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./inngest/index.js";
+import showRouter from "./routes/show.route.js";
 
 export const app = express();
 
@@ -22,7 +23,9 @@ app.use(cors());
 // Clerk middleware for authentication
 app.use(clerkMiddleware());
 
+// Endpoints
 app.use("/api/inngest", serve({ client: inngest, functions }));
+app.use("/api/show", showRouter)
 
 // '/' route to check if the server is running
 app.get("/", (req, res) => {
