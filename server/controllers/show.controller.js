@@ -54,7 +54,8 @@ const getNowPlayingMovies = async (req, res) => {
 
 		const filteredMovies = filterMoviesWithPosterAndBackdrop(combinedMovies);
 
-		// 🔐 Save to cache
+        // 🔐 Save to cache
+        fs.mkdirSync(path.dirname(CACHE_FILE), { recursive: true });
         fs.writeFileSync(CACHE_FILE, JSON.stringify(filteredMovies, null, 2));
         
 		res.json({ movies: filteredMovies, success: true });
