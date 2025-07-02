@@ -19,7 +19,8 @@ axiosRetry(axios, {
 const CACHE_FILE = path.resolve("cache/nowPlaying.json");
 
 const getNowPlayingMovies = async (req, res) => {
-    try {
+	try {
+		console.log("Fetching now playing movies...");
 		const today = dayjs();
 		const oneMonthAgo = today.subtract(1, "month");
 
@@ -58,6 +59,7 @@ const getNowPlayingMovies = async (req, res) => {
         fs.mkdirSync(path.dirname(CACHE_FILE), { recursive: true });
         fs.writeFileSync(CACHE_FILE, JSON.stringify(filteredMovies, null, 2));
         
+		console.log(`Fetched ${filteredMovies.length} now playing movies.`);
 		res.json({ movies: filteredMovies, success: true });
 	} catch (error) {
 		console.error("Error fetching now playing movies:", error.message);
@@ -66,6 +68,7 @@ const getNowPlayingMovies = async (req, res) => {
 			const cachedData = fs.readFileSync(CACHE_FILE, "utf-8");
 			const movies = JSON.parse(cachedData);
 
+			console.log("Serving cached data due to API failure.");
             res.status(200).json({ movies, success: true,  message: "Serving cached data due to API failure"});
 		} catch (cacheErr) {
 			console.error("Cache read failed:", cacheErr.message);
