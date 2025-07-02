@@ -130,3 +130,10 @@ dist
 
 # vscode
 .vscode
+
+# Ignore everything inside server/cache/
+server/cache/*
+
+# Except the .gitkeep file so folder exists in repo
+!server/cache/.gitkeep
+
