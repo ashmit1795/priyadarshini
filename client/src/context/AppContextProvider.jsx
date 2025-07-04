@@ -59,7 +59,7 @@ export const AppContextProvider = ({ children }) => {
 				},
 			});
 			if (data.success) {
-				setFavoriteMovies(data.favoriteMovies);
+                setFavoriteMovies(data.favoriteMovies);
 			} else {
 				toast.error(data.message || "Failed to fetch favorite movies");
 			}
