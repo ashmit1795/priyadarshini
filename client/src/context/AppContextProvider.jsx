@@ -11,7 +11,9 @@ axios.defaults.baseURL = config.serverUrl;
 export const AppContextProvider = ({ children }) => {
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [shows, setShows] = useState([]);
-	const [favoriteMovies, setFavoriteMovies] = useState([]);
+    const [favoriteMovies, setFavoriteMovies] = useState([]);
+    
+    const imageBaseUrl = config.tmdbImageBaseUrl;
 
 	const { user } = useUser();
 	const { getToken } = useAuth();
@@ -88,6 +90,7 @@ export const AppContextProvider = ({ children }) => {
 		fetchShows,
 		fetchFavoriteMovies,
 		navigate,
+		imageBaseUrl,
 	};
 	return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
