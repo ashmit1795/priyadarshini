@@ -23,10 +23,7 @@ function MovieCard({ movie }) {
 			<p className="text-sm text-gray-400 mt-2">
 				{new Date(movie.release_date).getFullYear()}
 				<span> </span>•<span> </span>
-				{movie.genres
-					.slice(0, 2)
-					.map((genre) => genre.name)
-					.join(" | ")}
+				{movie.genres.slice(0, 2).join(" | ")}
 				<span> </span>•<span> </span>
 				{timeFormat(movie.runtime)}
 			</p>
