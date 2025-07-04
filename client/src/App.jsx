@@ -13,11 +13,15 @@ import Dashboard from "./pages/admin/Dashboard.jsx";
 import AddShows from "./pages/admin/AddShows.jsx";
 import ListShows from "./pages/admin/ListShows.jsx";
 import ListBookings from "./pages/admin/ListBookings.jsx";
+import useAppContext from "./hooks/useAppContext.js";
+import { SignIn } from "@clerk/clerk-react";
 
 
 function App() {
 
 	const isAdminRoute = useLocation().pathname.startsWith("/admin");
+
+	const { user } = useAppContext();
 
 	return (
 		<>
@@ -30,7 +34,18 @@ function App() {
 				<Route path="/movies/:id/:date" element={<SeatLayout />} />
 				<Route path="/favorite" element={<Favorite />} />
 				<Route path="/my-bookings" element={<MyBookings />} />
-				<Route path="/admin/*" element={<Layout />}>
+				<Route
+					path="/admin/*"
+					element={
+						user ? (
+							<Layout />
+						) : (
+							<div className="min-h-screen flex justify-center items-center">
+								<SignIn fallbackRedirectUrl={"/admin"} />
+							</div>
+						)
+					}
+				>
 					<Route index element={<Dashboard />} />
 					<Route path="add-shows" element={<AddShows />} />
 					<Route path="list-shows" element={<ListShows />} />
