@@ -32,7 +32,6 @@ export const AppContextProvider = ({ children }) => {
             if (!data.isAdmin && location.pathname.startsWith("/admin")) {
                 navigate("/"); // Redirect to home if not admin
                 toast.error("You are not authorized to access this page.");
-                
             }
         } catch (error) {
             console.error("Error fetching admin status:", error);
@@ -41,7 +40,7 @@ export const AppContextProvider = ({ children }) => {
 
     const fetchShows = async () => {
         try {
-            const { data } = await axios.get("/shows/all");
+            const { data } = await axios.get("/show/all");
             if(data.success) {
                 setShows(data.shows);
             } else {
@@ -88,6 +87,8 @@ export const AppContextProvider = ({ children }) => {
         favoriteMovies,
         user,
         getToken,
+        fetchIsAdmin,
+        fetchShows,
         fetchFavoriteMovies,
         navigate
     };
