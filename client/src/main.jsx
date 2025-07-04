@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import config from "./config/config.js";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { dark } from "@clerk/themes";
+import { AppContextProvider } from "./context/AppContextProvider.jsx";
 
 const PUBLISHABLE_KEY = config.clerkPublishableKey;
 
@@ -15,7 +16,9 @@ if (!PUBLISHABLE_KEY) {
 createRoot(document.getElementById("root")).render(
 	<ClerkProvider appearance={{ baseTheme: dark }} publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
 		<BrowserRouter>
-			<App />
+			<AppContextProvider>
+				<App />
+			</AppContextProvider>
 		</BrowserRouter>
 	</ClerkProvider>
 );
