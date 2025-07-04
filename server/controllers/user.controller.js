@@ -35,17 +35,20 @@ const updateFavoriteMovie = async (req, res) => {
             user.privateMetadata.favoriteMovies = [];
         }
 
+        let message;
         if(!user.privateMetadata.favoriteMovies.includes(movieId)) {
             user.privateMetadata.favoriteMovies.push(movieId);
+            message = "Added to favorites successfully."
         } else {
             user.privateMetadata.favoriteMovies = user.privateMetadata.favoriteMovies.filter(id => id !== movieId);
+            message = "Removed from favorites successfully.";
         }
         
         await clerkClient.users.updateUserMetadata(userId, {
             privateMetadata: user.privateMetadata
         });
 
-        res.status(200).json({ success: true, message: "Favorite movie updated successfully." });
+        res.status(200).json({ success: true, message });
     } catch (error) {
         console.error("Error updating favorite movie:", error.message);
         res.status(500).json({ success: false, error: error.message });
