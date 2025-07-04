@@ -1,27 +1,45 @@
 import { useEffect, useState } from "react";
 import config from "../../config/config";
-import { dummyBookingData } from "../../assets/assets";
 import { Loading, Title } from "../../components";
 import dateFormat from "../../lib/dateFormat";
+import { useCallback } from "react";
+import toast from "react-hot-toast";
+import useAppContext from "../../hooks/useAppContext";
 
 function ListBookings() {
     const currency = config.currency;
 
     const [bookings, setBookings] = useState([]);
-    const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(true);
+	
+	const { axios, getToken, user } = useAppContext();
 
-    const getAllBookings = async () => {
-        setBookings(dummyBookingData);
-        setLoading(false);
-    }
+	const getAllBookings = useCallback(async () => {
+		try {
+			const { data } = await axios.get("/admin/all-bookings", {
+				headers: {
+					Authorization: `Bearer ${await getToken()}`,
+				},
+			});
+			if (data.success) {
+				setBookings(data.bookings);
+			} else {
+				toast.error(data.message || "Failed to fetch bookings");
+			}
+		} catch (error) {
+			console.error("Error fetching bookings:", error);
+			toast.error(error.message || "Failed to fetch bookings");
+		}
+		setLoading(false);
+	}, [axios, getToken]);
 
     useEffect(() => {
-        getAllBookings();
-    }, [])
+        if(user) getAllBookings();
+    }, [getAllBookings, user]);
 
     return !loading ? (
 		<div>
-			<Title text1="List1" text2="Bookings" />
+			<Title text1="List" text2="Bookings" />
 			<div className="max-w-4xl mt-6 overflow-x-auto">
 				<table className="w-full border-collapse rounded-md overflow-hidden text-nowrap">
 					<thead>
