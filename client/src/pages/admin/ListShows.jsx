@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import config from "../../config/config";
-import { dummyShowsData } from "../../assets/assets";
+import config from "../../config/config.js";
 import { Loading, Title } from "../../components";
-import dateFormat from "../../lib/dateFormat";
+import dateFormat from "../../lib/dateFormat.js";
+import toast from "react-hot-toast";
+import { useCallback } from "react";
+import useAppContext from "../../hooks/useAppContext.js";
 
 function ListShows() {
     const currency = config.currency;
@@ -10,29 +12,30 @@ function ListShows() {
     const [shows, setShows] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const getAllShows = async () => {
-        try {
-            setShows([
-                {
-                    movie: dummyShowsData[0],
-                    showDateTime: "2025-06-30T02:30:00.000Z",
-                    showPrice: 59,
-                    occupiedSeats: {
-                        A1: "user_1",
-                        B1: "user_2",
-                        C1: "user_3"
-                    }
-                }
-            ]);
-            setLoading(false);
-        } catch (error) {
-            console.error(error)
-        }
-    }
+    const { axios, getToken, user } = useAppContext();
+
+    const getAllShows = useCallback(async () => {
+		try {
+			const { data } = await axios.get("/admin/all-shows", {
+				headers: {
+					Authorization: `Bearer ${await getToken()}`,
+				},
+			});
+			if (data.success) {
+				setShows(data.shows);
+			} else {
+				toast.error(data.message || "Failed to fetch shows");
+			}
+		} catch (error) {
+			console.error("Error fetching shows:", error);
+			toast.error(error.message || "Failed to fetch shows");
+		}
+        setLoading(false);
+	}, [axios, getToken]);
 
     useEffect(() => {
-        getAllShows();
-    }, [])
+        if (user) getAllShows();
+    }, [user, getAllShows]);
 
     return !loading ? (
 		<>
