@@ -98,7 +98,6 @@ const getNowPlayingMovies = async (req, res) => {
 		}
 	]
 */
-
 const addShows = async (req, res) => { 
 	try {
 		const { movieId, showsInput, showPrice } = req.body;
@@ -168,7 +167,57 @@ const addShows = async (req, res) => {
 	}
 }
 
-export {getNowPlayingMovies, addShows}
+// API endpoint to get all shows from the database
+const getShows = async (req, res) => {
+	try {
+		const shows = await Show.find({ showDateTime: { $gte: new Date() } }).populate("movie").sort({ showDateTime: 1 });
+
+		// Filter uniques shows
+		const uniqueShows = new Set(shows.map(show => show.movie));
+		res.json({ success: true, shows: Array.from(uniqueShows) });
+	} catch (error) {
+		console.error("Error fetching shows:", error.message);
+		res.status(500).json({ success: false, error: error.message });
+	}
+}
+
+// API endpoint to get all shows for a specific movie
+const getShowsForMovie = async (req, res) => {
+	const { movieId } = req.params;
+	try {
+		const shows = await Show.find({ movie: movieId, showDateTime: { $gte: new Date() } });
+
+		const movie = await Movie.findById(movieId);
+		const dateTime = {};
+		/*
+			dateTime is an object where keys are dates in YYYY-MM-DD format
+			and values are arrays of objects with show time and show ID.
+			Example:
+			{
+				"2023-09-01": [
+					{ time: "2023-09-01T10:00:00Z", showId: "show1" },
+					{ time: "2023-09-01T14:00:00Z", showId: "show2" }
+				],
+				"2023-09-02": [
+					{ time: "2023-09-02T12:00:00Z", showId: "show3" }
+				]
+			}
+		*/
+		shows.forEach((show) => {
+			const date = show.showDateTime.toISOString().split("T")[0];
+			if (!dateTime[date]) {
+				dateTime[date] = [];
+			}
+			dateTime[date].push({ time: show.showDateTime, showId: show._id });
+		});
+		res.json({ success: true, movie, dateTime });
+	} catch (error) {
+		console.error("Error fetching shows for movie:", error.message);
+		res.status(500).json({ success: false, error: error.message });
+	}
+}
+
+export { getNowPlayingMovies, addShows, getShows, getShowsForMovie };
 
 // Utility function to filter movies with both poster and backdrop
 // This function filters out movies that do not have both poster_path and backdrop_path
