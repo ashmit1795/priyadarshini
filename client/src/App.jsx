@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { Navbar, Footer } from "./components";
+import { Navbar, Footer, Loading } from "./components";
 import Movies from "./pages/Movies.jsx";
 import MovieDetails from "./pages/MovieDetails.jsx";
 import SeatLayout from "./pages/SeatLayout.jsx";
@@ -34,6 +34,7 @@ function App() {
 				<Route path="/movies/:id/:date" element={<SeatLayout />} />
 				<Route path="/favorite" element={<Favorite />} />
 				<Route path="/my-bookings" element={<MyBookings />} />
+				<Route path="/loading/:nextUrl" element={<Loading />} />
 				<Route
 					path="/admin/*"
 					element={
