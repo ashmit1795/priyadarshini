@@ -1,23 +1,43 @@
 import React, { useEffect, useState } from 'react'
 import config from '../config/config.js';
-import { dummyBookingData } from '../assets/assets.js';
 import { BlurCircle, Loading } from '../components/index.js';
 import timeFormat from '../lib/timeFormat.js';
 import dateFormat from '../lib/dateFormat.js';
+import useAppContext from '../hooks/useAppContext.js';
+import { useCallback } from 'react';
+import toast from 'react-hot-toast';
 
 function MyBookings() {
 	const currency = config.currency;
 	const [bookings, setBookings] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 
-	const getMyBookings = async () => {
-		setBookings(dummyBookingData);
+	const { axios, imageBaseUrl, getToken, user } = useAppContext();
+
+	const getMyBookings = useCallback(async () => {
+		try {
+			const { data } = await axios.get("/user/bookings", {
+				headers: {
+					Authorization: `Bearer ${await getToken()}`,
+				}
+			});
+
+			if (data.success) {
+				setBookings(data.bookings);
+			} else {
+				toast.error(data.message || "Failed to fetch bookings");
+			}
+		} catch (error) {
+			console.error("Error fetching bookings:", error);
+			toast.error("Failed to fetch bookings");
+		}
+
 		setIsLoading(false);
-	}
+	}, [axios, getToken]);
 
 	useEffect(() => {
-		getMyBookings();
-	}, [])
+		if (user) getMyBookings();
+	}, [user, getMyBookings]);
 
 	return !isLoading ? (
 		<div className="relative px-6 md:px-16 lg:px-40 pt-30 md:pt-40 min-h-[80vh]">
@@ -33,7 +53,7 @@ function MyBookings() {
 				>
 					<div className="flex flex-col md:flex-row">
 						<img
-							src={item.show.movie.poster_path}
+							src={`${imageBaseUrl}${item.show.movie.poster_path}`}
 							alt="movie poster"
 							className="md:max-w-45 aspect-video h-auto object-cover object-bottom rounded"
 						/>
