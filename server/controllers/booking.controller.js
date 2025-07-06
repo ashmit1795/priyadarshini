@@ -3,6 +3,7 @@ import { CASHFREE_APP_ID, CASHFREE_SECRET_KEY, SERVER_URL } from "../config/env.
 import Booking from "../models/booking.model.js";
 import Show from "../models/show.model.js";
 import { Cashfree, CFEnvironment } from "cashfree-pg"; 
+import { inngest } from "../inngest/index.js";
 
 const createBooking = async (req, res) => {
     try {
@@ -40,6 +41,14 @@ const createBooking = async (req, res) => {
         
         const response = await initiateCashfreePayment(booking._id, userId, origin);
         if (response.success) {
+            // Run inngest scheduler function to check payment status after 10 minutes
+            await inngest.send({
+                name: "app/checkpayment",
+                data: {
+                    bookingId: booking._id.toString()
+                }
+            });
+            
             return res.status(201).json({ success: true, sessionId: response.sessionId });
         } else {
             return res.status(500).json({ success: false, message: response.message });
