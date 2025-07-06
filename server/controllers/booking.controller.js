@@ -1,5 +1,8 @@
+import User from "../models/user.model.js";
+import { CASHFREE_APP_ID, CASHFREE_SECRET_KEY, SERVER_URL } from "../config/env.js";
 import Booking from "../models/booking.model.js";
 import Show from "../models/show.model.js";
+import { Cashfree, CFEnvironment } from "cashfree-pg"; 
 
 const createBooking = async (req, res) => {
     try {
@@ -32,13 +35,19 @@ const createBooking = async (req, res) => {
         show.markModified("occupiedSeats"); // Mark the field as modified
         await show.save();
 
-        // Stripe Gateway Integration
-        console.log("Starting Stripe payment process...");
+        // Cashfree Gateway Integration
+        console.log("Starting Cashfree payment process...");
+        
+        const response = await initiateCashfreePayment(booking._id, userId, origin);
+        if (response.success) {
+            return res.status(201).json({ success: true, sessionId: response.sessionId });
+        } else {
+            return res.status(500).json({ success: false, message: response.message });
+        }
 
-        return res.status(201).json({ success: true, message: "Booking created successfully." });
     } catch (error) {
-        console.error("Error creating booking:", error.message);
-        return res.status(500).json({ success: false, error: error.message });
+        console.error("Error creating booking:", error);
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 
@@ -56,7 +65,71 @@ const getOccupiedSeats = async (req, res) => {
     }
 }
 
-export { createBooking, getOccupiedSeats };
+const verifyPayment = async (req, res) => { 
+    try {
+		const { bookingId } = req.params;
+		const cashfree = new Cashfree(CFEnvironment.SANDBOX, CASHFREE_APP_ID, CASHFREE_SECRET_KEY);
+
+        console.log("Verifying payment for booking ID:", bookingId);
+        const { data } = await cashfree.PGOrderFetchPayments(bookingId);
+		if (data && data.length > 0) {
+			if (data[0].payment_status === "SUCCESS") {
+				const booking = await Booking.findById(bookingId);
+				booking.isPaid = true;
+				booking.paymentLink = null;
+                await booking.save();
+
+                const { data: orderData } = await cashfree.PGFetchOrder(bookingId);
+                const { origin } = orderData.order_tags;
+                return res.redirect(`${origin}/loading/my-bookings`);
+            } else {
+                const { data: orderData } = await cashfree.PGFetchOrder(bookingId);
+                const { origin } = orderData.order_tags;
+                return res.redirect(`${origin}/my-bookings`);
+            }
+        } else {
+            const { data: orderData } = await cashfree.PGFetchOrder(bookingId);
+			const { origin } = orderData.order_tags;
+			return res.redirect(`${origin}/my-bookings`);
+        }
+	} catch (error) {
+		console.error("Error verifying payment:", error);
+		return res.status(500).json({ success: false, message: error.message });
+	}
+    
+}
+
+const completeBooking = async (req, res) => {
+    try {
+        const cashfree = new Cashfree(CFEnvironment.SANDBOX, CASHFREE_APP_ID, CASHFREE_SECRET_KEY);
+		// Step 1: Fetch order details
+		const orderResponse = await cashfree.PGFetchOrder(req.params.bookingId);
+		const orderData = orderResponse.data;
+
+		// Step 2: Check if order is active
+		if (orderData.order_status !== "ACTIVE") {
+			throw new Error(`Order is not active. Status: ${orderData.order_status}`);
+		}
+
+		// Check if order is not expired
+		if (new Date() > new Date(orderData.order_expiry_time)) {
+			throw new Error("Order has expired");
+		}
+
+		// Step 3: Use the payment_session_id for payment
+		const paymentSessionId = orderData.payment_session_id;
+		if (paymentSessionId) {
+			return res.status(201).json({ success: true, sessionId: paymentSessionId });
+		} else {
+			return res.status(500).json({ success: false, message: "Failed to create payment session" });
+		}
+	} catch (error) {
+        console.error("Error completing booking:", error.message);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+export { createBooking, getOccupiedSeats, verifyPayment, completeBooking };
 
 // Utility function to check seat availability
 const checkSeatsAvailability = async (showId, selectedSeats) => {
@@ -74,3 +147,49 @@ const checkSeatsAvailability = async (showId, selectedSeats) => {
         return false;
     }
 }
+
+// Utility function to initiate cashfree payment
+const initiateCashfreePayment = async (bookingId, userId, origin) => {
+	try {
+		const booking = await Booking.findById(bookingId).populate("show");
+        const show = await Show.findById(booking.show).populate("movie");
+        const user = await User.findById(userId);
+        
+		const cashfree = new Cashfree(CFEnvironment.SANDBOX, CASHFREE_APP_ID, CASHFREE_SECRET_KEY);
+
+		const date30MinLater = new Date(Date.now() + 30 * 60 * 1000);
+		const isoString = date30MinLater.toISOString();
+		const order_expiry_time = isoString.split(".")[0] + "Z";
+
+		let request = {
+			order_amount: booking.amount,
+			order_currency: "INR",
+			order_id: booking._id.toString(),
+			order_note: "Booking for show: " + show.movie.title,
+			customer_details: {
+                customer_id: userId.toString(),
+                customer_name: user.name,
+                customer_email: user.email,
+				customer_phone: "8474090589",
+			},
+			order_expiry_time,
+			order_meta: {
+				return_url: `${SERVER_URL}/booking/verify-payment/${booking._id}`,
+			},
+			order_tags: {
+				origin: origin, // Store the origin of the request
+				bookingId: booking._id.toString(),
+			},
+		};
+
+		const { data } = await cashfree.PGCreateOrder(request);
+
+		booking.paymentLink = data.payment_session_id;
+        await booking.save();
+
+        return { success: true, sessionId: data.payment_session_id };
+	} catch (error) {
+		console.error("Error initiating cashfree payment:", error);
+		return { success: false, message: error.message };
+	}
+};
