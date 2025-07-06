@@ -40,15 +40,16 @@ const createBooking = async (req, res) => {
         console.log("Starting Cashfree payment process...");
         
         const response = await initiateCashfreePayment(booking._id, userId, origin);
+        
+        // Run inngest scheduler function to check payment status after 10 minutes
+        await inngest.send({
+            name: "app/checkpayment",
+            data: {
+                bookingId: booking._id.toString()
+            }
+        });
+
         if (response.success) {
-            // Run inngest scheduler function to check payment status after 10 minutes
-            await inngest.send({
-                name: "app/checkpayment",
-                data: {
-                    bookingId: booking._id.toString()
-                }
-            });
-            
             return res.status(201).json({ success: true, sessionId: response.sessionId });
         } else {
             return res.status(500).json({ success: false, message: response.message });
