@@ -6,8 +6,11 @@ import dateFormat from '../lib/dateFormat.js';
 import useAppContext from '../hooks/useAppContext.js';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { initializeSDK, cashfree } from "../config/cashfree.js";
 
 function MyBookings() {
+	initializeSDK();
+
 	const currency = config.currency;
 	const [bookings, setBookings] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -34,6 +37,29 @@ function MyBookings() {
 
 		setIsLoading(false);
 	}, [axios, getToken]);
+
+	const completeBooking = async (booking) => {
+		try {
+			const { data } = await axios.post(`/booking/complete-booking/${booking._id}`, {
+				headers: {
+					Authorization: `Bearer ${await getToken()}`,
+				}
+			});
+
+			if (data.success) {
+				let checkoutOptions = {
+					paymentSessionId: data.sessionId,
+				};
+				cashfree.checkout(checkoutOptions);
+			} else {
+				toast.error(data.message || "Failed to book ticket");
+			}
+		} catch (error) {
+			console.error("Error completing booking:", error);
+			toast.error(error.response?.data?.message || "Failed to complete booking");
+			
+		}
+	};
 
 	useEffect(() => {
 		if (user) getMyBookings();
@@ -71,7 +97,7 @@ function MyBookings() {
 								{item.amount}
 							</p>
 							{!item.isPaid && (
-								<button className="bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer">Pay Now</button>
+								<button onClick={() => completeBooking(item)} className="bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer">Pay Now</button>
 							)}
 						</div>
 						<div className="text-sm">
