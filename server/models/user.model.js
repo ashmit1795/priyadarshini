@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    phone: {
+        type: String,
+        default: "9999999999", // Default phone number
+    },
     image: {
         type: String,
         required: true,

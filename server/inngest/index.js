@@ -19,7 +19,8 @@ const syncUserCreation = inngest.createFunction(
             _id: id,
             name: `${first_name} ${last_name}`,
             email: email_addresses[0].email_address,
-            image: image_url
+            image: image_url,
+            phone: phone_numbers[0].phone_number
         }
 
         await User.create(userData);
@@ -40,6 +41,7 @@ const syncUserDeletion = inngest.createFunction(
     }
 );
 
+// Inngest function to update user data in the database
 const syncUserUpdation = inngest.createFunction(
 	{
 		id: "update-user-with-clerk",
@@ -53,7 +55,8 @@ const syncUserUpdation = inngest.createFunction(
 			_id: id,
 			name: `${first_name} ${last_name}`,
 			email: email_addresses[0].email_address,
-			image: image_url,
+            image: image_url,
+            phone: phone_numbers[0].phone_number
 		};
 		await User.findByIdAndUpdate(id, userData);
 	}
