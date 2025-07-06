@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { assets } from "../assets/assets.js";
 import { BlurCircle, Loading } from "../components/index.js";
 import { ArrowRightIcon, ClockIcon } from "lucide-react";
@@ -7,14 +7,16 @@ import isoTimeFormat from "../lib/isoTimeFormat.js";
 import toast from "react-hot-toast";
 import useAppContext from "../hooks/useAppContext.js";
 import { useCallback } from "react";
+import { initializeSDK, cashfree } from "../config/cashfree.js";
 
 function SeatLayout() {
+	initializeSDK();
+
 	const { id, date } = useParams();
 	const [selectedSeats, setSelectedSeats] = useState([]);
 	const [selectedTime, setSelectedTime] = useState(null);
 	const [show, setShow] = useState(null);
 	const [occupiedSeats, setOccupiedSeats] = useState([]);
-	const navigate = useNavigate();
 
 	const { axios, getToken, user } = useAppContext();
 
@@ -108,8 +110,10 @@ function SeatLayout() {
 			});
 
 			if (data.success) {
-				toast.success("Ticket booked successfully");
-				navigate("/my-bookings");
+				let checkoutOptions = {
+					paymentSessionId: data.sessionId,
+				};
+				cashfree.checkout(checkoutOptions);
 			} else {
 				toast.error(data.message || "Failed to book ticket");
 			}
