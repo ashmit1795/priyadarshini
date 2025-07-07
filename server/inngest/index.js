@@ -7,7 +7,11 @@ import connectDB from "../db/db.js";
 import sendEmail from "../config/nodemailer.js";
 
 // Create a client to send and receive events
-export const inngest = new Inngest({ id: "movie-ticket-booking" });
+export const inngest = new Inngest(
+    {
+        id: "movie-ticket-booking"
+    }
+);
 
 // Inngest function to save user data to the database
 const syncUserCreation = inngest.createFunction(
@@ -17,7 +21,11 @@ const syncUserCreation = inngest.createFunction(
 	{
 		event: "clerk/user.created",
 	},
-	async ({ event }) => {
+    async ({ event }) => {
+		// Ensure database connection is active
+		if (mongoose.connection.readyState !== 1) {
+			await connectDB();
+		}
 		const { id, first_name, last_name, email_addresses, image_url, phone_numbers } = event.data;
 		const userData = {
 			_id: id,
@@ -39,7 +47,11 @@ const syncUserDeletion = inngest.createFunction(
 	{
 		event: "clerk/user.deleted",
 	},
-	async ({ event }) => {
+    async ({ event }) => {
+		// Ensure database connection is active
+		if (mongoose.connection.readyState !== 1) {
+			await connectDB();
+		}
 		const { id } = event.data;
 		await User.findByIdAndDelete(id);
 	}
@@ -53,7 +65,11 @@ const syncUserUpdation = inngest.createFunction(
 	{
 		event: "clerk/user.updated",
 	},
-	async ({ event }) => {
+    async ({ event }) => {
+		// Ensure database connection is active
+		if (mongoose.connection.readyState !== 1) {
+			await connectDB();
+		}
 		const { id, first_name, last_name, email_addresses, image_url, phone_numbers } = event.data;
 		const userData = {
 			_id: id,
@@ -108,7 +124,12 @@ const sendBookingConfirmationMail = inngest.createFunction(
 	{
 		event: "app/show.booked",
 	},
-	async ({ event, step }) => {
+    async ({ event, step }) => {
+		// Ensure database connection is active
+		if (mongoose.connection.readyState !== 1) {
+			await connectDB();
+        }
+        
 		const bookingId = event.data.bookingId;
 
 		const booking = await Booking.findById(bookingId)
