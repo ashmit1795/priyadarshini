@@ -189,7 +189,7 @@ const initiateCashfreePayment = async (bookingId, userId, origin) => {
                 customer_id: userId.toString(),
                 customer_name: user.name,
                 customer_email: user.email,
-				customer_phone: "8474090589",
+				customer_phone: user.phone,
 			},
 			order_expiry_time,
 			order_meta: {
