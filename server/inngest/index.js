@@ -3,6 +3,8 @@ import { Inngest } from "inngest";
 import User from "../models/user.model.js";
 import Booking from "../models/booking.model.js";
 import Show from "../models/show.model.js";
+import mongoose from "mongoose";
+import connectDB from "../db/db.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "movie-ticket-booking" });
@@ -77,20 +79,24 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
         await step.sleepUntil("wait-for-10-minutes", tenMinutesLater);
 
         await step.run("check-payment-status", async () => {
-            const bookingId = event.data.bookingId;
-            const booking = await Booking.findById(bookingId);
+			// Ensure database connection is active
+			if (mongoose.connection.readyState !== 1) {
+                await connectDB();
+			}
+			const bookingId = event.data.bookingId;
+			const booking = await Booking.findById(bookingId);
 
-            // If payment is not made, release the seats and delete the booking
-            if (!booking.isPaid) {
-                const show = await Show.findById(booking.show);
-                booking.bookedSeats.forEach((bookedSeat) => {
-                    delete show.occupiedSeats[bookedSeat]
-                });
-                show.markModified("occupiedSeats");
-                await show.save();
-                await Booking.findByIdAndDelete(booking._id);
-            }
-        })
+			// If payment is not made, release the seats and delete the booking
+			if (!booking.isPaid) {
+				const show = await Show.findById(booking.show);
+				booking.bookedSeats.forEach((bookedSeat) => {
+					delete show.occupiedSeats[bookedSeat];
+				});
+				show.markModified("occupiedSeats");
+				await show.save();
+				await Booking.findByIdAndDelete(booking._id);
+			}
+		})
     }
 );
 
