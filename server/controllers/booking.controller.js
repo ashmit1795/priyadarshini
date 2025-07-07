@@ -40,7 +40,7 @@ const createBooking = async (req, res) => {
         console.log("Starting Cashfree payment process...");
         
         const response = await initiateCashfreePayment(booking._id, userId, origin);
-        
+
         // Run inngest scheduler function to check payment status after 10 minutes
         await inngest.send({
             name: "app/checkpayment",
@@ -91,6 +91,15 @@ const verifyPayment = async (req, res) => {
 
                 const { data: orderData } = await cashfree.PGFetchOrder(bookingId);
                 const { origin } = orderData.order_tags;
+
+                // Send confirmation email
+                await inngest.send({
+                    name: "app/show.booked",
+                    data: {
+                        bookingId
+                    }
+				});
+
                 return res.redirect(`${origin}/loading/my-bookings`);
             } else {
                 const { data: orderData } = await cashfree.PGFetchOrder(bookingId);
