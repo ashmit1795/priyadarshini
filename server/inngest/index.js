@@ -6,6 +6,8 @@ import mongoose from "mongoose";
 import connectDB from "../db/db.js";
 import sendEmail from "../config/nodemailer.js";
 import { LOGO_URL, WEBSITE_URL } from "../config/env.js";
+import { use } from "react";
+import Movie from "../models/movie.model.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest(
@@ -352,12 +354,122 @@ const sendReminders = inngest.createFunction(
     }
 );
 
+// Inngest Function to send notifications on adding new show
+const sendNewShowNotifications = inngest.createFunction(
+    {
+        id: "send-new-show-notification"
+    },
+    {
+        event: "app/show.added"
+    },
+    async ({ event, step }) => {
+        
+        if (mongoose.connection.readyState !== 1) {
+            await connectDB();
+        }
+        
+        const { movieId } = event.data;
+
+        const users = await User.find({});
+        const movie = await Movie.findById(movieId);
+        const movieTitle = movie.title;
+
+        const newShowEmailTemplate = ({ userName, movieTitle, movieId, posterUrl, description, websiteUrl, logoUrl }) => `
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>New Show Added - Priyadarshini</title>
+                </head>
+                <body style="margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #001f3f; color: #ffffff;">
+                    <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width: 600px; margin: auto; background-color: #112240; border-radius: 10px; overflow: hidden;">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 20px; text-align: center; background-color: #001f3f;">
+                                <img src="${logoUrl}" alt="Priyadarshini Logo" width="200" style="margin-bottom: 10px;" />
+                                <h3 style="margin: 0; color: #f30e0e;">🎉 A New Show Just Dropped!</h3>
+                            </td>
+                        </tr>
+
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding: 25px;">
+                                <p style="font-size: 16px;">Hi <strong>${userName}</strong> 👋,</p>
+                                <p style="font-size: 15px; line-height: 1.6;">
+                                    We’ve just added a brand-new show for <strong>${movieTitle}</strong> and you might not want to miss it!
+                                </p>
+
+                                <!-- Poster -->
+                                <div style="text-align: center; margin: 20px 0;">
+                                    <img src="${posterUrl}" alt="${movieTitle} Poster" style="max-width: 100%; border-radius: 8px;" />
+                                </div>
+
+                                <!-- Movie Title -->
+                                <table style="margin-top: 10px; width: 100%; font-size: 15px; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 8px; color: #aaa;">🎬 Movie</td>
+                                        <td style="padding: 8px;">${movieTitle}</td>
+                                    </tr>
+                                </table>
+
+                                <!-- Description -->
+                                <p style="font-size: 14px; line-height: 1.5; margin-top: 20px; color: #ddd;">
+                                    ${description}
+                                </p>
+
+                                <!-- CTA -->
+                                <a href="${websiteUrl}/movies/${movieId}" style="display: inline-block; margin-top: 25px; padding: 14px 30px; background-color: #f30e0e; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: bold; text-align: center;">🎟️ Book Now</a>
+
+                                <p style="font-size: 14px; color: #aaa; margin-top: 30px;">See you at the movies!<br><span style="color: #f30e0e;">– Team Priyadarshini 🍿</span></p>
+                            </td>
+                        </tr>
+
+                        <!-- Footer -->
+                        <tr>
+                            <td style="background-color: #001f3f; padding: 15px; text-align: center; font-size: 12px; color: #777;">
+                                &copy; 2025 Priyadarshini. All rights reserved.
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+            </html>
+        `;
+
+
+        for (const user of users) {
+            const userEmail = user.email;
+            const userName = user.name;
+            const subject = `🎬 Just In: New Show Added for ${movieTitle} – Book Now!`;
+
+            await sendEmail({
+                to: userEmail,
+                subject,
+                body: newShowEmailTemplate({
+                    userName,
+                    movieTitle,
+                    movieId,
+                    posterUrl: movie.backdrop_path,
+                    description: movie.overview,
+                    websiteUrl: WEBSITE_URL,
+                    logoUrl: LOGO_URL
+                })
+            })
+        }
+
+        return {
+            message: "Notifications sent."
+        }
+    }
+);
+
 // Create an empty array where we'll export future Inngest functions
 export const functions = [
-    syncUserCreation,
-    syncUserDeletion,
-    syncUserUpdation,
-    releaseSeatsAndDeleteBooking,
-    sendBookingConfirmationMail,
-    sendReminders
+	syncUserCreation,
+	syncUserDeletion,
+	syncUserUpdation,
+	releaseSeatsAndDeleteBooking,
+	sendBookingConfirmationMail,
+	sendReminders,
+	sendNewShowNotifications,
 ];
