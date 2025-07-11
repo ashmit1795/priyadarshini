@@ -157,7 +157,7 @@ const sendBookingConfirmationMail = inngest.createFunction(
                         <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width: 600px; margin: auto; background-color: #112240; border-radius: 8px; overflow: hidden;">
                             <tr>
                                 <td style="padding: 20px; text-align: center; background-color: #0b1d34;">
-                                    <img src=${LOGO_URL} alt="Priyadarshini Logo" width="250" style="margin-bottom: 10px;" />
+                                    <img src=${LOGO_URL} alt="Priyadarshini Logo" width="200" style="margin-bottom: 10px;" />
                                     <h3 style="margin: 0; color: #ff3c3c;">Booking Confirmed 🎉</h3>
                                 </td>
                             </tr>
@@ -463,6 +463,118 @@ const sendNewShowNotifications = inngest.createFunction(
     }
 );
 
+// Inngest Function to send payment pending email
+const sendPaymentPendingEmail = inngest.createFunction(
+    {
+        id: "send-payment-pending-email"
+    },
+    {
+        event: "app/payment.pending"
+    },
+    async ({ event, step }) => {
+        if (mongoose.connection.readyState !== 1) {
+            await connectDB();
+        }
+
+        const bookingId = event.data.bookingId;
+        const booking = await Booking.findById(bookingId)
+			.populate({
+				path: "show",
+				populate: {
+					path: "movie",
+					model: "Movie",
+				},
+			})
+            .populate("user");
+        
+        const paymentPendingTemplate = ({ userName, movieTitle, bookedSeats, showDate, showTime, bookingId, websiteUrl, logoUrl }) => `
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>Complete Your Payment - Priyadarshini</title>
+                </head>
+                <body style="margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #001f3f; color: #ffffff;">
+                    <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width: 600px; margin: auto; background-color: #112240; border-radius: 10px; overflow: hidden;">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 20px; text-align: center; background-color: #001f3f;">
+                                <img src="${logoUrl}" alt="Priyadarshini Logo" width="200" style="margin-bottom: 10px;" />
+                                <h2 style="margin: 0; color: #f30e0e;">⏳ Payment Pending!</h2>
+                            </td>
+                        </tr>
+
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding: 25px;">
+                                <p style="font-size: 16px;">Hi <strong>${userName}</strong>,</p>
+                                <p style="font-size: 15px; line-height: 1.6;">
+                                    You’ve selected <strong>${movieTitle}</strong> and your seats <strong>(${bookedSeats.join(", ")})</strong> are reserved.
+                                </p>
+
+                                <p style="font-size: 15px; margin-top: 10px; line-height: 1.6;">
+                                    ⚠️ Please complete your payment within <strong>10 minutes</strong> to confirm the booking.
+                                    If payment isn’t made within the time, your seats will be released and the booking will be automatically cancelled.
+                                </p>
+
+                                <table style="margin: 20px 0; width: 100%; font-size: 15px; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 8px; color: #aaa;">🎬 Movie</td>
+                                        <td style="padding: 8px;">${movieTitle}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; color: #aaa;">📅 Date</td>
+                                        <td style="padding: 8px;">${showDate}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; color: #aaa;">⏰ Time</td>
+                                        <td style="padding: 8px;">${showTime}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; color: #aaa;">💺 Seats</td>
+                                        <td style="padding: 8px;">${bookedSeats.join(", ")}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; color: #aaa;">🆔 Booking ID</td>
+                                        <td style="padding: 8px;">${bookingId}</td>
+                                    </tr>
+                                </table>
+
+                                <a href="${websiteUrl}/my-bookings" style="display: inline-block; margin-top: 25px; padding: 14px 30px; background-color: #f30e0e; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: bold; text-align: center;">💳 Complete Payment</a>
+
+                                <p style="font-size: 14px; color: #aaa; margin-top: 30px;">Need help? Reach out to our support. <br><span style="color: #f30e0e;">– Team Priyadarshini 🎬</span></p>
+                            </td>
+                        </tr>
+
+                        <!-- Footer -->
+                        <tr>
+                            <td style="background-color: #001f3f; padding: 15px; text-align: center; font-size: 12px; color: #777;">
+                                &copy; 2025 Priyadarshini. All rights reserved.
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+            </html>
+        `;
+
+        await sendEmail({
+            to: booking.user.email,
+            subject: `⏳ Payment Pending for Your Booking - ${booking.show.movie.title}`,
+            body: paymentPendingTemplate({
+                userName: booking.user.name,
+                movieTitle: booking.show.movie.title,
+                showDate: booking.show.showDateTime.toLocaleDateString("en-US", { timeZone: "Asia/Kolkata" }),
+                showTime: booking.show.showDateTime.toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata", hour: '2-digit', minute: '2-digit' }),
+                bookedSeats: booking.bookedSeats,
+                bookingId: booking._id,
+                websiteUrl: WEBSITE_URL,
+                logoUrl: LOGO_URL
+            }),
+        });
+    }
+);
+
 // Create an empty array where we'll export future Inngest functions
 export const functions = [
 	syncUserCreation,
@@ -471,5 +583,6 @@ export const functions = [
 	releaseSeatsAndDeleteBooking,
 	sendBookingConfirmationMail,
 	sendReminders,
-	sendNewShowNotifications,
+    sendNewShowNotifications,
+    sendPaymentPendingEmail
 ];
