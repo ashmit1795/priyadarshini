@@ -79,7 +79,7 @@ function MyBookings() {
 				>
 					<div className="flex flex-col md:flex-row">
 						<img
-							src={`${imageBaseUrl}${item.show.movie.poster_path}`}
+							src={`${imageBaseUrl}${item.show.movie.backdrop_path}`}
 							alt="movie poster"
 							className="md:max-w-45 aspect-video h-auto object-cover object-bottom rounded"
 						/>
