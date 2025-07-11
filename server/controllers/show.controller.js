@@ -6,6 +6,7 @@ import fs from "fs";
 import path from "path";
 import Movie from "../models/movie.model.js";
 import Show from "../models/show.model.js";
+import { inngest } from "../inngest/index.js";
 
 axiosRetry(axios, {
 	retries: 3, // Try up to 3 times
@@ -139,7 +140,17 @@ const addShows = async (req, res) => {
 			}
 
 			// Save the movie to the database
-			movie = Movie.create(movieDetails);
+			movie = await Movie.create(movieDetails);
+
+			const addedMovie = await Movie.findById(movie._id);
+
+			// Inngest event to notify that a new movie has been added
+			await inngest.send({
+				name: "app/show.added",
+				data: {
+					movieId: addedMovie._id
+				}
+			})
 		}
 
 		const shows = [];
