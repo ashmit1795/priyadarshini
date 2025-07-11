@@ -443,18 +443,18 @@ const sendNewShowNotifications = inngest.createFunction(
             const subject = `🎬 Just In: New Show Added for ${movieTitle} – Book Now!`;
 
             await sendEmail({
-                to: userEmail,
-                subject,
-                body: newShowEmailTemplate({
-                    userName,
-                    movieTitle,
-                    movieId,
-                    posterUrl: movie.backdrop_path,
-                    description: movie.overview,
-                    websiteUrl: WEBSITE_URL,
-                    logoUrl: LOGO_URL
-                })
-            })
+				to: userEmail,
+				subject,
+				body: newShowEmailTemplate({
+					userName,
+					movieTitle,
+					movieId,
+					posterUrl: `https://image.tmdb.org/t/p/original${movie.backdrop_path}`,
+					description: movie.overview,
+					websiteUrl: WEBSITE_URL,
+					logoUrl: LOGO_URL,
+				}),
+			});
         }
 
         return {
