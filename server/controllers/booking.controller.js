@@ -104,13 +104,31 @@ const verifyPayment = async (req, res) => {
             } else {
                 const { data: orderData } = await cashfree.PGFetchOrder(bookingId);
                 const { origin } = orderData.order_tags;
+
+                // Inngest event to notify that payment is pending
+                await inngest.send({
+                    name: "app/payment.pending",
+                    data: {
+                        bookingId
+                    }
+				});
+
                 return res.redirect(`${origin}/my-bookings`);
             }
         } else {
-            const { data: orderData } = await cashfree.PGFetchOrder(bookingId);
+			const { data: orderData } = await cashfree.PGFetchOrder(bookingId);
 			const { origin } = orderData.order_tags;
+
+			// Inngest event to notify that payment is pending
+			await inngest.send({
+				name: "app/payment.pending",
+				data: {
+					bookingId,
+				},
+			});
+
 			return res.redirect(`${origin}/my-bookings`);
-        }
+		}
 	} catch (error) {
 		console.error("Error verifying payment:", error);
 		return res.status(500).json({ success: false, message: error.message });
