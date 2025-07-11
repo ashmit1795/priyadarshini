@@ -156,12 +156,12 @@ const sendBookingConfirmationMail = inngest.createFunction(
                             <tr>
                                 <td style="padding: 20px; text-align: center; background-color: #0b1d34;">
                                     <img src=${LOGO_URL} alt="Priyadarshini Logo" width="250" style="margin-bottom: 10px;" />
-                                    <h4 style="margin: 0; color: #ff3c3c;">Booking Confirmed 🎉</h4>
+                                    <h3 style="margin: 0; color: #ff3c3c;">Booking Confirmed 🎉</h3>
                                 </td>
                             </tr>
                             <tr>
                                 <td style="padding: 25px; background-color: #112240;">
-                                    <p style="font-size: 16px;">Hi <strong>${booking.user.name}</strong>👋,</p>
+                                    <p style="font-size: 16px;">Hi <strong>${booking.user.name}</strong> 👋,</p>
                                     <p style="font-size: 15px; line-height: 1.6;">
                                         Your booking for <strong>${booking.show.movie.title}</strong> has been confirmed!
                                     </p>
@@ -198,7 +198,7 @@ const sendBookingConfirmationMail = inngest.createFunction(
                             </tr>
                             <tr>
                                 <td style="background-color: #0b1d34; padding: 15px; text-align: center; font-size: 12px; color: #777;">
-                                    &copy; Priyadarshini. All rights reserved.
+                                    &copy; 2025 Priyadarshini. All rights reserved.
                                 </td>
                             </tr>
                         </table>
@@ -214,11 +214,150 @@ const sendBookingConfirmationMail = inngest.createFunction(
 	}
 );
 
+// Inngest Function to send reminders
+const sendReminders = inngest.createFunction(
+    {
+        id: "send-show-reminders"
+    },
+    {
+        cron: "0 */8 * * *" // Execute in every 8 hours
+    },
+    async ({ step }) => {
+        const now = new Date();
+        const in8Hours = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+        const windowStart = new Date(in8Hours.getTime() - 10 * 60 * 1000);
+
+        // Prepare reminder tasks
+        const reminderTasks = await step.run("prepare-reminder-tasks", async () => {
+            const shows = await Show.find({
+                showDateTime: {
+                    $gte: windowStart,
+                    $lte: in8Hours
+                }
+            }).populate("movie");
+
+            const tasks = [];
+
+            for (const show of shows) {
+                if (!show.movie || !show.occupiedSeats) continue;
+
+                const userIds = [...new Set(Object.values(show.occupiedSeats))];
+
+                if (userIds.length === 0) continue;
+
+                const users = await User.find({
+                    _id: {
+                        $in: userIds
+                    }
+                }).select("name email");
+
+                for (const user of users) {
+                    tasks.push({
+                        userEmail: user.email,
+                        userName: user.name,
+                        movieTitle: show.movie.title,
+                        showTime: show.showDateTime
+                    })
+                }
+            }
+
+            return tasks;
+        });
+
+        if (reminderTasks.length === 0) {
+            return {
+                sent: 0,
+                message: "No reminders to send."
+            }
+        }
+
+        const reminderEmailTemplate = ({ userName, movieTitle, showTime, websiteUrl, logoUrl }) => `
+                <!DOCTYPE html>
+                <html lang="en">
+                    <head>
+                        <meta charset="UTF-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <title>Show Reminder - Priyadarshini</title>
+                    </head>
+                    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #001f3f; color: #ffffff;">
+                        <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width: 600px; margin: auto; background-color: #112240; border-radius: 8px; overflow: hidden;">
+                            <tr>
+                                <td style="padding: 20px; text-align: center; background-color: #001f3f;">
+                                    <img src="${logoUrl}" alt="Priyadarshini Logo" width="200" style="margin-bottom: 10px;" />
+                                    <h3 style="margin: 0; color: #f30e0e;">Upcoming Show Reminder 🎬</h3>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 25px;">
+                                    <p style="font-size: 16px;">Hi <strong>${userName}</strong>,</p>
+                                    <p style="font-size: 15px; line-height: 1.6;">
+                                        Just a friendly reminder that your show <strong>${movieTitle}</strong> is scheduled soon. Here's your showtime:
+                                    </p>
+                                    <table style="margin: 20px 0; width: 100%; font-size: 15px; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px; color: #aaa;">📅 Date</td>
+                                            <td style="padding: 8px;">
+                                                ${new Date(showTime).toLocaleDateString("en-US", { timeZone: "Asia/Kolkata" })}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px; color: #aaa;">⏰ Time</td>
+                                            <td style="padding: 8px;">
+                                                ${new Date(showTime).toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata" })}
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <p style="font-size: 15px;">Please arrive 15 minutes early to avoid last-minute hassles.</p>
+                                    <a href="${websiteUrl}/my-bookings" style="display: inline-block; margin-top: 20px; padding: 12px 25px; background-color: #f30e0e; color: #ffffff; text-decoration: none; border-radius: 25px; font-weight: 600;">View Your Bookings</a>
+                                    <p style="font-size: 14px; color: #aaa; margin-top: 30px;">Thanks for choosing <span style="color: #f30e0e;">Priyadarshini</span>. 🍿<br/> We hope you have a fantastic experience!</p>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="background-color: #001f3f; padding: 15px; text-align: center; font-size: 12px; color: #777;">
+                                    &copy; 2025 Priyadarshini. All rights reserved.
+                                </td>
+                            </tr>
+                        </table>
+                    </body>
+                </html>`;
+
+
+        // Send reminder emails
+        const results = await step.run("send-all-reminders", async () => {
+            return await Promise.allSettled(
+                reminderTasks.map(task => sendEmail({
+                    to: task.userEmail,
+                    subject: `🎬 Reminder: Your show ${task.movieTitle} is starting soon!`,
+                    body: reminderEmailTemplate({
+                        userName: task.userName,
+                        movieTitle: task.movieTitle,
+                        showTime: task.showTime,
+                        websiteUrl: WEBSITE_URL,
+                        logoUrl: LOGO_URL
+                    })
+                }))
+            );
+        });
+
+        const sent = results.filter(r => r.status === "fulfilled").length;
+        const failed = results.length - sent;
+
+        return {
+            sent,
+            failed,
+            message: `Sent ${sent} reminder(s), ${failed} failed`
+        }
+    }
+);
+
 // Create an empty array where we'll export future Inngest functions
 export const functions = [
     syncUserCreation,
     syncUserDeletion,
     syncUserUpdation,
     releaseSeatsAndDeleteBooking,
-    sendBookingConfirmationMail
+    sendBookingConfirmationMail,
+    sendReminders
 ];
