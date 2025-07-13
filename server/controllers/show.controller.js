@@ -101,7 +101,7 @@ const getNowPlayingMovies = async (req, res) => {
 */
 const addShows = async (req, res) => { 
 	try {
-		const { movieId, showsInput, showPrice } = req.body;
+		const { movieId, showsInput, showPrice, trailer } = req.body;
 		
 		let movie = await Movie.findById(movieId);
 		if (!movie) {
@@ -137,6 +137,7 @@ const addShows = async (req, res) => {
 				})),
 				vote_average: movieDetailsData.vote_average,
 				runtime: movieDetailsData.runtime,
+				trailer: trailer || "",
 			}
 
 			// Save the movie to the database
@@ -144,7 +145,7 @@ const addShows = async (req, res) => {
 
 			const addedMovie = await Movie.findById(movie._id);
 
-			// Inngest event to notify that a new movie has been added
+			// Inngest event to notify users that a new movie has been added
 			await inngest.send({
 				name: "app/show.added",
 				data: {
