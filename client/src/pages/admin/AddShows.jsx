@@ -26,10 +26,13 @@ function AddShows() {
         Example: [["2023-10-01", ["10:00", "14:00"]], ["2023-10-02", ["12:00", "16:00"]]]
     */
     const [dateTimeInput, setDateTimeInput] = useState("");
-    const [showPrice, setShowPrice] = useState("");
-    const [addingShow, setAddingShow] = useState(false);
+	const [showPrice, setShowPrice] = useState("");
+	const [movieTrailer, setMovieTrailer] = useState("");
+	const [addingShow, setAddingShow] = useState(false);
 
-    const { axios, getToken, imageBaseUrl } = useAppContext();
+	const { axios, getToken, imageBaseUrl, movies } = useAppContext();
+	console.log(movies);
+	console.log(selectedMovie);
 
     const fetchNowPlayingMovies = useCallback(async () => {
 		try {
@@ -92,12 +95,13 @@ function AddShows() {
                 }
             });
     
-            const payload = {
-                movieId: selectedMovie,
-                showsInput,
-                showPrice: Number(showPrice),
-            }
-    
+			const payload = {
+				movieId: selectedMovie,
+				showsInput,
+				showPrice: Number(showPrice),
+				movieTrailer: movieTrailer || "",
+			};
+
             const { data } = await axios.post("/show/add", payload, {
                 headers: {
                     Authorization: `Bearer ${await getToken()}`,
@@ -171,6 +175,21 @@ function AddShows() {
 					/>
 				</div>
 			</div>
+			{/* Movie Trailer Input (moved here for visibility) */}
+			{selectedMovie && !movies.some((movie) => String(movie._id) === String(selectedMovie)) && (
+				<div className="mt-8">
+					<label className="block text-sm font-medium mb-2">Movie Trailer</label>
+					<div className="inline-flex items-center gap-2 border border-gray-600 px-3 py-2 rounded-md">
+						<input
+							type="text"
+							value={movieTrailer}
+							onChange={(e) => setMovieTrailer(e.target.value)}
+							placeholder="Enter movie trailer URL"
+							className="outline-none"
+						/>
+					</div>
+				</div>
+			)}
 
 			{/* Date & Time Selection */}
 			<div className="mt-6">
@@ -217,9 +236,13 @@ function AddShows() {
 				</div>
 			)}
 
-            <button onClick={handleSubmit} disabled={addingShow} className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer">
-                {addingShow ? "Adding..." : "Add Show"}
-            </button>
+			<button
+				onClick={handleSubmit}
+				disabled={addingShow}
+				className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer"
+			>
+				{addingShow ? "Adding..." : "Add Show"}
+			</button>
 		</>
 	) : (
 		<Loading />
