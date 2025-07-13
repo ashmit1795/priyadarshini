@@ -11,6 +11,7 @@ axios.defaults.baseURL = config.serverUrl;
 export const AppContextProvider = ({ children }) => {
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [shows, setShows] = useState([]);
+	const [movies, setMovies] = useState([]);
     const [favoriteMovies, setFavoriteMovies] = useState([]);
     
     const imageBaseUrl = config.tmdbImageBaseUrl;
@@ -51,6 +52,20 @@ export const AppContextProvider = ({ children }) => {
 		}
 	};
 
+	const fetchMovies = async () => {
+		try {
+			const { data } = await axios.get("/movie/");
+			if (data.success) {
+				setMovies(data.movies);
+			} else {
+				toast.error(data.message || "Failed to fetch movies");
+			}
+		} catch (error) {
+			console.error("Error fetching movies:", error);
+			
+		}
+	};
+
 	const fetchFavoriteMovies = useCallback(async () => {
 		try {
 			const { data } = await axios.get("/user/favorites", {
@@ -70,6 +85,7 @@ export const AppContextProvider = ({ children }) => {
 
 	useEffect(() => {
 		fetchShows();
+		fetchMovies();
 	}, []);
 
 	useEffect(() => {
@@ -91,6 +107,7 @@ export const AppContextProvider = ({ children }) => {
 		fetchFavoriteMovies,
 		navigate,
 		imageBaseUrl,
+		movies,
 	};
 	return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
