@@ -1,15 +1,18 @@
 import { useEffect, useState, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { BlurCircle, DateSelect, MovieCard, Loading } from "../components";
 import { Heart, PlayCircleIcon, StarIcon } from "lucide-react";
 import timeFormat from "../lib/timeFormat.js";
 import useAppContext from "../hooks/useAppContext.js";
 import toast from "react-hot-toast";
+import ReactPlayer from "react-player";
 
 function MovieDetails() {
 	const { id } = useParams();
 	const [show, setShow] = useState(null);
 	const navigate = useNavigate();
+	const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+
 
 	const { shows, axios, imageBaseUrl, getToken, user, fetchFavoriteMovies, favoriteMovies } = useAppContext();
 
@@ -85,10 +88,16 @@ function MovieDetails() {
 						{show.movie.release_date.split("-")[0]}
 					</p>
 					<div className="flex items-center flex-wrap gap-4 mt-4">
-						<button className="flex items-center gap-2 px-7 py-3 text-sm bg-gray-800 hover:bg-gray-900 transition rounded-md font-medium cursor-pointer active:scale-95">
-							<PlayCircleIcon className="w-5 h-5" />
-							Watch Trailer
-						</button>
+						{
+							show.movie.trailer &&
+							<button
+								onClick={() => setIsTrailerOpen(true)}
+								className="flex items-center gap-2 px-7 py-3 text-sm bg-gray-800 hover:bg-gray-900 transition rounded-md font-medium cursor-pointer active:scale-95"
+							>
+								<PlayCircleIcon className="w-5 h-5" />
+								Watch Trailer
+							</button>
+						}
 						<a
 							href="#date-select"
 							className="px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-md font-medium cursor-pointer active:scale-95"
@@ -96,7 +105,11 @@ function MovieDetails() {
 							Buy Tickets
 						</a>
 						<button onClick={handleFavorite} className="bg-gray-700 p-2.5 rounded-full transition cursor-pointer active:scale-95">
-							<Heart className={`w-5 h-5 ${favoriteMovies.find((movie) => movie._id === id) ? "fill-primary text-primary" : ""} hover:fill-primary-dull hover:text-primary-dull`} />
+							<Heart
+								className={`w-5 h-5 ${
+									favoriteMovies.find((movie) => movie._id === id) ? "fill-primary text-primary" : ""
+								} hover:fill-primary-dull hover:text-primary-dull`}
+							/>
 						</button>
 					</div>
 				</div>
@@ -142,6 +155,34 @@ function MovieDetails() {
 					</button>
 				)}
 			</div>
+
+			{isTrailerOpen && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+					<div className="relative w-full max-w-4xl mx-auto p-4">
+						{/* Close button */}
+						<button
+							onClick={() => setIsTrailerOpen(false)}
+							className="absolute top-2 right-2 text-white bg-gray-700 hover:bg-red-600 rounded-full w-9 h-9 flex items-center justify-center"
+						>
+							&times;
+						</button>
+
+						{/* Trailer player */}
+						{show.movie.trailer && (
+							<div className="aspect-video w-full">
+								<ReactPlayer
+									url={show.movie.trailer}
+									playing
+									controls
+									width="100%"
+									height="100%"
+									onEnded={() => setIsTrailerOpen(false)}
+								/>
+							</div>
+						)}
+					</div>
+				</div>
+			)}
 		</div>
 	) : (
 		<Loading />
