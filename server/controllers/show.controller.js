@@ -101,7 +101,7 @@ const getNowPlayingMovies = async (req, res) => {
 */
 const addShows = async (req, res) => { 
 	try {
-		const { movieId, showsInput, showPrice, trailer } = req.body;
+		const { movieId, showsInput, showPrice, movieTrailer } = req.body;
 		
 		let movie = await Movie.findById(movieId);
 		if (!movie) {
@@ -137,8 +137,8 @@ const addShows = async (req, res) => {
 				})),
 				vote_average: movieDetailsData.vote_average,
 				runtime: movieDetailsData.runtime,
-				trailer: trailer || "",
-			}
+				trailer: movieTrailer || "",
+			};
 
 			// Save the movie to the database
 			movie = await Movie.create(movieDetails);
