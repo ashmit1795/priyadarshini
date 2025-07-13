@@ -11,7 +11,7 @@ function Navbar() {
     const { openSignIn } = useClerk();
 	const navigate = useNavigate();
 	
-	const { favoriteMovies } = useAppContext();
+	const { favoriteMovies, isAdmin } = useAppContext();
 
 	return (
 		<div className="fixed top-0 z-50 w-full flex items-center justify-between px-6 md:px-16 lg:px-36 py-5">
@@ -43,6 +43,19 @@ function Navbar() {
 				>
 					Movies
 				</Link>
+				{
+					isAdmin && (
+						<Link
+							className="text-primary"
+							onClick={() => {
+								scrollTo(0, 0);
+								setIsOpen(false);
+							}}
+							to="/admin"
+						>
+							Admin
+						</Link>
+				)}
 				{/* <Link onClick={() => {scrollTo(0,0); setIsOpen(false)}} to="/"> 
                     Theaters
                 </Link> */}
@@ -50,19 +63,17 @@ function Navbar() {
 				{/* <Link onClick={() => {scrollTo(0,0); setIsOpen(false)}} to="/">
                     Releases
                 </Link> */}
-				{
-					favoriteMovies.length > 0 && (
-						<Link
-							onClick={() => {
-								scrollTo(0, 0);
-								setIsOpen(false);
-							}}
-							to="/favorite"
-						>
-							Favorites
-						</Link>
-					)
-				}
+				{favoriteMovies.length > 0 && (
+					<Link
+						onClick={() => {
+							scrollTo(0, 0);
+							setIsOpen(false);
+						}}
+						to="/favorite"
+					>
+						Favorites
+					</Link>
+				)}
 			</div>
 
 			<div className=" min-md:px-6 py-3 border-0 rounded-full backdrop-blur flex items-center gap-8">
