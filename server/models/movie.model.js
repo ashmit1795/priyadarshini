@@ -47,6 +47,9 @@ const movieSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    trailer: {
+        type: String
+    },
 }, { timestamps: true });
 
 const Movie = mongoose.model("Movie", movieSchema);
