@@ -12,10 +12,10 @@ const getAllMovies = async (req, res) => {
 
 const getAllMoviesTrailers = async (req, res) => {
     try {
-        const movies = await Movie.find().select("_id title trailer").sort({ createdAt: -1 });
-        res.json({ success: true, movies });
+        const trailers = await Movie.find().select("_id title trailer").sort({ createdAt: -1 });
+        res.json({ success: true, trailers });
     } catch (error) {
-        console.error("Error fetching movies:", error.message);
+        console.error("Error fetching trailers:", error.message);
         res.status(500).json({ success: false, message: error.message });
     }
 }
