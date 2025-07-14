@@ -179,11 +179,11 @@ const verifyBooking = async (req, res) => {
         }).populate("user");
 
         if (!booking) {
-            return res.status(404).json({ success: false, message: "Booking not found or not paid" });
+            return res.json({ success: false, message: "Booking not found or not paid" });
         }
 
         if(booking.checkedIn) {
-            return res.status(400).json({ success: false, message: "Ticket already used" });
+            return res.json({ success: false, message: "Ticket already used" });
         }
 
         const now = new Date();
@@ -192,11 +192,11 @@ const verifyBooking = async (req, res) => {
         const validFrom = new Date(showStartTime.getTime() - 60 * 60000); // 1 hour before showtime
 
         if(now < validFrom) {
-            return res.status(400).json({ success: false, message: "Ticket is not valid at this time" });
+            return res.json({ success: false, message: "Ticket is not valid at this time" });
         }
 
         if(now > showEndTime) {
-            return res.status(400).json({ success: false, message: "Ticket is expired" });
+            return res.json({ success: false, message: "Ticket is expired" });
         }
 
         booking.checkedIn = true;
