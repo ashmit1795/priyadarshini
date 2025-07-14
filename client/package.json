@@ -13,7 +13,7 @@
     "@cashfreepayments/cashfree-js": "^1.0.5",
     "@clerk/clerk-react": "^5.32.2",
     "@clerk/themes": "^2.2.52",
-    "@tailwindcss/vite": "^4.1.10",
+    "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.10.0",
     "lucide-react": "^0.523.0",
     "qrcode.react": "^4.2.0",
