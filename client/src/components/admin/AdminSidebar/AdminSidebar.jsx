@@ -1,7 +1,7 @@
 import { LayoutDashboardIcon, ListCollapseIcon, ListIcon, LoaderCircle, PlusSquareIcon, ScanQrCodeIcon } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import useAppContext from "../../../hooks/useAppContext.js";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useClerk } from "@clerk/clerk-react";
 
 
@@ -17,25 +17,24 @@ function AdminSidebar() {
 
 	const { axios, getToken } = useAppContext();
 
-	const fetchUser = async () => {
+	const fetchUser = useCallback(async () => {
 		try {
 			const { data } = await axios.get("/user/", {
 				headers: {
 					Authorization: `Bearer ${await getToken()}`,
-				}
+				},
 			});
 			if (data.success) {
 				setUser(data.user);
 			}
 		} catch (error) {
 			console.error("Error fetching user:", error);
-			
 		}
-	}
+	}, [axios, getToken]);
 
 	useEffect(() => {
 		fetchUser();
-	}, []);
+	}, [fetchUser]);
 
 
     const adminNavLinks = [
