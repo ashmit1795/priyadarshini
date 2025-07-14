@@ -24,20 +24,31 @@ const getDashboardData = async (req, res) => {
         res.json({ success: true, dashboardData });
     } catch (error) {
         console.error("Error getting dashboard data:", error.message);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
 }
 
-// API endpoint to get all the shows
+// API endpoint to get all the upcoming shows
 const getAllShows = async (req, res) => {
     try {
         const shows = await Show.find({ showDateTime: { $gte: new Date() } }).populate("movie").sort({ showDateTime: 1 });
         res.json({ success: true, shows });
     } catch (error) {
         console.error("Error getting all shows:", error.message);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
+
+// API endpoint to get all past shows
+const getAllPastShows = async (req, res) => {
+    try {
+        const shows = await Show.find({ showDateTime: { $lt: new Date() } }).populate("movie").sort({ showDateTime: -1 });
+        res.json({ success: true, shows });
+    } catch (error) {
+        console.error("Error getting all past shows:", error.message);
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
 
 // API endpoint to get all bookings
 const getAllBookings = async (req, res) => {
@@ -56,4 +67,4 @@ const getAllBookings = async (req, res) => {
     }
 };
 
-export { isAdmin, getDashboardData, getAllShows, getAllBookings };
+export { isAdmin, getDashboardData, getAllShows, getAllBookings, getAllPastShows };
