@@ -15,6 +15,7 @@ import ListShows from "./pages/admin/ListShows.jsx";
 import ListBookings from "./pages/admin/ListBookings.jsx";
 import useAppContext from "./hooks/useAppContext.js";
 import { SignIn } from "@clerk/clerk-react";
+import VerifyBooking from "./pages/admin/VerifyBooking.jsx";
 
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
 					<Route path="add-shows" element={<AddShows />} />
 					<Route path="list-shows" element={<ListShows />} />
 					<Route path="list-bookings" element={<ListBookings />} />
+					<Route path="verify-booking" element={<VerifyBooking />} />
 				</Route>
 			</Routes>
 			{!isAdminRoute && <Footer />}

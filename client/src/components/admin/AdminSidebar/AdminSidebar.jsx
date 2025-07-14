@@ -1,4 +1,4 @@
-import { LayoutDashboardIcon, ListCollapseIcon, ListIcon, LucideListCollapse, PlusSquareIcon } from "lucide-react";
+import { LayoutDashboardIcon, ListCollapseIcon, ListIcon, PlusSquareIcon, ScanQrCodeIcon } from "lucide-react";
 import { assets } from "../../../assets/assets.js";
 import { NavLink } from "react-router-dom";
 
@@ -13,7 +13,8 @@ function AdminSidebar() {
         { name: "Dashboard", path: "/admin", icon: LayoutDashboardIcon },
         { name: "Add Shows", path: "/admin/add-shows", icon: PlusSquareIcon },
         { name: "List Shows", path: "/admin/list-shows", icon: ListIcon },
-        { name: "List Bookings", path: "/admin/list-bookings", icon: ListCollapseIcon },
+		{ name: "List Bookings", path: "/admin/list-bookings", icon: ListCollapseIcon },
+		{ name: "Verify Booking", path: "/admin/verify-booking", icon: ScanQrCodeIcon }
         
     ]
 
