@@ -1,4 +1,4 @@
-import { LayoutDashboardIcon, ListCollapseIcon, ListIcon, LoaderCircle, PlusSquareIcon, ScanQrCodeIcon } from "lucide-react";
+import { History, LayoutDashboardIcon, ListCollapseIcon, ListIcon, LoaderCircle, PlusSquareIcon, ScanQrCodeIcon } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import useAppContext from "../../../hooks/useAppContext.js";
 import { useState, useEffect, useCallback } from "react";
@@ -42,7 +42,8 @@ function AdminSidebar() {
         { name: "Add Shows", path: "/admin/add-shows", icon: PlusSquareIcon },
         { name: "List Shows", path: "/admin/list-shows", icon: ListIcon },
 		{ name: "List Bookings", path: "/admin/list-bookings", icon: ListCollapseIcon },
-		{ name: "Verify Booking", path: "/admin/verify-booking", icon: ScanQrCodeIcon }
+		{ name: "Past Shows", path: "/admin/past-shows", icon: History  },
+		{ name: "Verify Booking", path: "/admin/verify-booking", icon: ScanQrCodeIcon },
         
     ]
 

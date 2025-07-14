@@ -1,4 +1,3 @@
-import React from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { Navbar, Footer, Loading } from "./components";
 import Movies from "./pages/Movies.jsx";
@@ -16,6 +15,7 @@ import ListBookings from "./pages/admin/ListBookings.jsx";
 import useAppContext from "./hooks/useAppContext.js";
 import { SignIn } from "@clerk/clerk-react";
 import VerifyBooking from "./pages/admin/VerifyBooking.jsx";
+import PastShows from "./pages/admin/PastShows.jsx";
 
 
 function App() {
@@ -53,6 +53,7 @@ function App() {
 					<Route path="list-shows" element={<ListShows />} />
 					<Route path="list-bookings" element={<ListBookings />} />
 					<Route path="verify-booking" element={<VerifyBooking />} />
+					<Route path="past-shows" element={<PastShows />} />
 				</Route>
 			</Routes>
 			{!isAdminRoute && <Footer />}
