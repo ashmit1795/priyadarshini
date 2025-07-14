@@ -2,6 +2,7 @@ import { clerkClient } from "@clerk/express";
 import Booking from "../models/booking.model.js";
 import { use } from "react";
 import Movie from "../models/movie.model.js";
+import User from "../models/user.model.js";
 
 // API endpoint to get user bookings
 const getUserBookings = async (req, res) => { 
@@ -20,6 +21,21 @@ const getUserBookings = async (req, res) => {
     } catch (error) {
         console.error("Error fetching user bookings:", error.message);
         res.status(500).json({ success: false, error: error.message });
+        
+    }
+}
+
+const getUser = async (req, res) => {
+    try {
+        const userId = req.auth().userId;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.json({ success: false, message: "User not found" });
+        }
+        res.status(200).json({ success: true, user });
+    } catch (error) {
+        console.error("Error fetching user:", error.message);
+        res.status(500).json({ success: false, message: error.message });
         
     }
 }
@@ -71,4 +87,4 @@ const getFavoriteMovies = async (req, res) => {
     }
 }
 
-export { getUserBookings, updateFavoriteMovie, getFavoriteMovies };
+export { getUserBookings, updateFavoriteMovie, getFavoriteMovies, getUser };
