@@ -192,7 +192,7 @@ const verifyBooking = async (req, res) => {
         const validFrom = new Date(showStartTime.getTime() - 60 * 60000); // 1 hour before showtime
 
         if(now < validFrom) {
-            return res.json({ success: false, message: "Ticket is not valid at this time" });
+            return res.json({ success: false, message: "Ticket is not valid at this time, ticket is valid from " + validFrom.toLocaleString() });
         }
 
         if(now > showEndTime) {
