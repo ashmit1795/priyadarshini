@@ -86,7 +86,8 @@ const verifyPayment = async (req, res) => {
 			if (data[0].payment_status === "SUCCESS") {
 				const booking = await Booking.findById(bookingId);
 				booking.isPaid = true;
-				booking.paymentLink = null;
+                booking.paymentLink = null;
+                booking.generateQrToken();
                 await booking.save();
 
                 const { data: orderData } = await cashfree.PGFetchOrder(bookingId);
@@ -98,7 +99,8 @@ const verifyPayment = async (req, res) => {
                     data: {
                         bookingId
                     }
-				});
+                });
+                
 
                 return res.redirect(`${origin}/loading/my-bookings`);
             } else {
@@ -166,7 +168,56 @@ const completeBooking = async (req, res) => {
     }
 }
 
-export { createBooking, getOccupiedSeats, verifyPayment, completeBooking };
+const verifyBooking = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const booking = await Booking.findOne({ qrToken: token, isPaid: true }).populate({
+            path: "show",
+            populate: {
+                path: "movie",
+            },
+        }).populate("user");
+
+        if (!booking) {
+            return res.status(404).json({ success: false, message: "Booking not found or not paid" });
+        }
+
+        if(booking.checkedIn) {
+            return res.status(400).json({ success: false, message: "Ticket already used" });
+        }
+
+        const now = new Date();
+        const showStartTime = new Date(booking.show.showDateTime);
+        const showEndTime = new Date(showStartTime.getTime() + booking.show.movie.runtime * 60000);
+        const validFrom = new Date(showStartTime.getTime() - 60 * 60000); // 1 hour before showtime
+
+        if(now < validFrom) {
+            return res.status(400).json({ success: false, message: "Ticket is not valid at this time" });
+        }
+
+        if(now > showEndTime) {
+            return res.status(400).json({ success: false, message: "Ticket is expired" });
+        }
+
+        booking.checkedIn = true;
+        await booking.save();
+
+        const data = {
+            bookingId: booking._id,
+            user: booking.user.name,
+            movie: booking.show.movie.title,
+            showTime: booking.show.showDateTime,
+        }
+
+        return res.status(200).json({ success: true, message: "Booking verified successfully", data });
+    } catch (error) {
+        console.error("Error verifying booking:", error.message);
+        res.status(500).json({ success: false, message: error.message });
+        
+    }
+}
+
+export { createBooking, getOccupiedSeats, verifyPayment, completeBooking, verifyBooking };
 
 // Utility function to check seat availability
 const checkSeatsAvailability = async (showId, selectedSeats) => {
