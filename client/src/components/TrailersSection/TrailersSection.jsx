@@ -41,9 +41,9 @@ function TrailersSection() {
 			</div>
 			{trailers.length > 0 && (
 				<div className="group grid grid-cols-4 gap-4 md:gap-8 mt-8 max0w-3xl mx-auto">
-					{trailers.map((trailer) => (
+					{trailers.slice(0, 4).map((trailer) => (
 						<div
-							key={trailer.trailer}
+							key={trailer._id}
 							onClick={() => setCurrentTrailer(trailer)}
 							className="relative group-hover:not-hover:opacity-50 hover:-translate-y-1 duration-300 transition max-md:h-60 md:max-h-60 cursor-pointer"
 						>
