@@ -17,6 +17,8 @@ function SeatLayout() {
 	const [selectedTime, setSelectedTime] = useState(null);
 	const [show, setShow] = useState(null);
 	const [occupiedSeats, setOccupiedSeats] = useState([]);
+	const [agreed, setAgreed] = useState(false);
+
 
 	const { axios, getToken, user } = useAppContext();
 
@@ -95,6 +97,7 @@ function SeatLayout() {
 
 	const bookTicket = async () => {
 		try {
+			if (!agreed) return toast.error("Please agree to the no‑cancellation policy");
 			if (!user) return toast.error("You need to be logged in to book a ticket");
 			if (!selectedTime || !selectedSeats.length) {
 				return toast.error("Please select a time and at least one seat");
@@ -171,9 +174,26 @@ function SeatLayout() {
 					</div>
 				</div>
 
+				{/* Disclaimer & checkbox */}
+				<div className="mt-12 flex items-start gap-2 max-w-md">
+					<input
+						id="agree"
+						type="checkbox"
+						checked={agreed}
+						onChange={(e) => setAgreed(e.target.checked)}
+						className="mt-1 h-4 w-4 accent-primary cursor-pointer"
+					/>
+					<label htmlFor="agree" className="text-xs text-gray-400 leading-tight cursor-pointer select-none">
+						I understand that once payment is completed and the booking is confirmed,
+						<span className="text-white font-medium"> it cannot be cancelled/refunded.</span>
+					</label>
+				</div>
+
 				<button
 					onClick={bookTicket}
-					className="flex items-center gap-1 mt-20 px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer active:scale-95 "
+					className={`flex items-center gap-1 mt-12 px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer active:scale-95 ${
+						agreed ? "bg-primary hover:bg-primary-dull cursor-pointer" : "bg-gray-600 opacity-50 cursor-not-allowed"
+					}`}
 				>
 					Proceed to Checkout
 					<ArrowRightIcon strokeWidth={3} className="w-4 h-4" />
