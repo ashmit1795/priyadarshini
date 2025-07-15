@@ -1,13 +1,23 @@
 import nodemailer from "nodemailer";
-import { EMAIL_APP_PASSWORD, SENDER_EMAIL } from "./env.js";
+import { EMAIL_APP_PASSWORD, SENDER_EMAIL, SMTP_PASS } from "./env.js";
 
-// Create a transporter for Gmail
+// // Create a transporter for Gmail
+// const transporter = nodemailer.createTransport({
+// 	service: "gmail",
+// 	auth: {
+// 		user: SENDER_EMAIL,
+// 		pass: EMAIL_APP_PASSWORD,
+// 	},
+// });
+
 const transporter = nodemailer.createTransport({
-	service: "gmail",
-	auth: {
-		user: SENDER_EMAIL,
-		pass: EMAIL_APP_PASSWORD,
-	},
+		host: "smtp.resend.com",
+		secure: true,
+		port: 465,
+		auth: {
+			user: "resend",
+			pass: SMTP_PASS, // Use your SMTP password here
+		},
 });
 
 const sendEmail = async ({ to, subject, body}) => {
