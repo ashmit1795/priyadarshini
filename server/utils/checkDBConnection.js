@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import connectDB from "../db/db.js";
 
 const checkDBConnection = async () => {
