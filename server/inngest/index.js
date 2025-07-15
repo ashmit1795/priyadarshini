@@ -211,7 +211,8 @@ const sendBookingConfirmationMail = inngest.createFunction(
 			to: booking.user.email,
 			subject: `🎬 Booking Confirmed: Enjoy ${booking.show.movie.title} at Priyadarshini!`,
             body: emailTemplate,
-            fromAlias: "+bookings"
+            fromAlias: "+bookings",
+            displayName: "Priyadarshini Bookings"
 		});
 	}
 );
@@ -339,7 +340,8 @@ const sendReminders = inngest.createFunction(
                         websiteUrl: WEBSITE_URL,
                         logoUrl: LOGO_URL
                     }),
-                    fromAlias: "+shows"
+                    fromAlias: "+shows",
+                    displayName: "Priyadarshini Shows"
                 }))
             );
         });
@@ -455,7 +457,8 @@ const sendNewShowNotifications = inngest.createFunction(
 					websiteUrl: WEBSITE_URL,
 					logoUrl: LOGO_URL,
                 }),
-                fromAlias: "+shows"
+                fromAlias: "+shows",
+                displayName: "Priyadarshini Shows"
 			});
         }
 
@@ -573,7 +576,8 @@ const sendPaymentPendingEmail = inngest.createFunction(
                 websiteUrl: WEBSITE_URL,
                 logoUrl: LOGO_URL
             }),
-            fromAlias: "+bookings"
+            fromAlias: "+bookings",
+            displayName: "Priyadarshini Bookings"
         });
     }
 );

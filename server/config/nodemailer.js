@@ -21,11 +21,11 @@ const transporter = nodemailer.createTransport({
 // 		},
 // });
 
-const sendEmail = async ({ to, subject, body, fromAlias = "" }) => {
+const sendEmail = async ({ to, subject, body, fromAlias = "", displayName = "Priyadarshini" }) => {
     const fromAddress = fromAlias ? appendAlias(SENDER_EMAIL, fromAlias) : SENDER_EMAIL;
     // Send the email
     const response = await transporter.sendMail({
-        from: fromAddress,
+        from: `${displayName} <${fromAddress}>`,
         to,
         subject,
         html: body
