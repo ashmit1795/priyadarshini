@@ -139,7 +139,7 @@ function MovieDetails() {
 			<p className="text-lg font-medium mt-20 mb-8">You May Also Like</p>
 			<div className="flex flex-wrap max-sm:justify-center gap-8">
 				{shows.slice(0, 4).map((movie, idx) => (
-					<MovieCard key={idx} movie={movie} />
+					movie._id !== id && <MovieCard key={idx} movie={movie} />
 				))}
 			</div>
 			<div className="flex justify-center mt-20">
