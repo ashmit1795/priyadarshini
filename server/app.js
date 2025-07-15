@@ -9,6 +9,7 @@ import bookingRouter from "./routes/booking.route.js";
 import adminRouter from "./routes/admin.route.js";
 import userRouter from "./routes/user.route.js";
 import movieRouter from "./routes/movie.route.js";
+import contactRouter from "./routes/contact.route.js";
 
 export const app = express();
 
@@ -34,6 +35,7 @@ app.use("/api/booking", bookingRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/user", userRouter);
 app.use("/api/movie", movieRouter);
+app.use("/api/contact", contactRouter);
 
 // '/' route to check if the server is running
 app.get("/", (req, res) => {
