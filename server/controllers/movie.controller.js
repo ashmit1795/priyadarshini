@@ -1,9 +1,11 @@
 import Movie from "../models/movie.model.js";
 import Show from "../models/show.model.js";
+import checkDBConnection from "../utils/checkDBConnection.js";
 
 // API endpoint to get all movies from the database
 const getAllMovies = async (req, res) => {
     try {
+        await checkDBConnection();
         const movies = await Movie.find().sort({ createdAt: -1 });
         res.json({ success: true, movies });
     } catch (error) {
@@ -16,6 +18,7 @@ const getAllMovies = async (req, res) => {
 // This endpoint is used to fetch trailers for shows that are scheduled in the future
 const getAllMoviesTrailers = async (req, res) => {
     try {
+        await checkDBConnection();
         // Get only those trailers of those shows which are at future date
         const shows = await Show.find({ showDateTime: { $gte: new Date() } }).populate("movie");
         const seenTitles = new Set();

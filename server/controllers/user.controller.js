@@ -1,12 +1,13 @@
 import { clerkClient } from "@clerk/express";
 import Booking from "../models/booking.model.js";
-import { use } from "react";
 import Movie from "../models/movie.model.js";
 import User from "../models/user.model.js";
+import checkDBConnection from "../utils/checkDBConnection.js";
 
 // API endpoint to get user bookings
 const getUserBookings = async (req, res) => { 
     try {
+        await checkDBConnection();
         const userId = req.auth().userId;
 
         const bookings = await Booking.find({ user: userId })
@@ -27,6 +28,7 @@ const getUserBookings = async (req, res) => {
 
 const getUser = async (req, res) => {
     try {
+        await checkDBConnection();
         const userId = req.auth().userId;
         const user = await User.findById(userId);
         if (!user) {
@@ -43,6 +45,7 @@ const getUser = async (req, res) => {
 // API endpoint to update favorite movie in clerk user metadata
 const updateFavoriteMovie = async (req, res) => { 
     try {
+        await checkDBConnection();
         const { movieId } = req.body;
         const userId = req.auth().userId;
 
@@ -74,6 +77,7 @@ const updateFavoriteMovie = async (req, res) => {
 // API endpoint to get favorite movies of a user
 const getFavoriteMovies = async (req, res) => { 
     try {
+        await checkDBConnection();
         const userId = req.auth().userId;
         const user = await clerkClient.users.getUser(userId);
         const favoriteMovies = user.privateMetadata.favoriteMovies || [];

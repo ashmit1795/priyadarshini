@@ -7,6 +7,7 @@ import path from "path";
 import Movie from "../models/movie.model.js";
 import Show from "../models/show.model.js";
 import { inngest } from "../inngest/index.js";
+import checkDBConnection from "../utils/checkDBConnection.js";
 
 axiosRetry(axios, {
 	retries: 3, // Try up to 3 times
@@ -26,6 +27,7 @@ const CACHE_FILE = path.join(CACHE_DIR, "nowPlaying.json");
 // API endpoint to get now playing movies from TMDB
 const getNowPlayingMovies = async (req, res) => {
 	try {
+		await checkDBConnection();
 		console.log("Fetching now playing movies...");
 		const today = dayjs();
 		const oneMonthAgo = today.subtract(1, "month");
@@ -181,6 +183,7 @@ const addShows = async (req, res) => {
 
 // API endpoint to get all shows from the database
 const getShows = async (req, res) => {
+	await checkDBConnection();
 	try {
 		const shows = await Show.find({ showDateTime: { $gte: new Date() } }).populate("movie").sort({ showDateTime: 1 });
 
@@ -197,6 +200,7 @@ const getShows = async (req, res) => {
 const getShowsForMovie = async (req, res) => {
 	const { movieId } = req.params;
 	try {
+		await checkDBConnection();
 		const shows = await Show.find({ movie: movieId, showDateTime: { $gte: new Date() } });
 
 		const movie = await Movie.findById(movieId);

@@ -1,6 +1,7 @@
 import Booking from "../models/booking.model.js";
 import Show from "../models/show.model.js";
 import User from "../models/user.model.js";
+import checkDBConnection from "../utils/checkDBConnection.js";
 
 // API endpoint to check if a user is an admin
 const isAdmin = async (req, res) => { 
@@ -10,6 +11,7 @@ const isAdmin = async (req, res) => {
 // API endpoint to get dashboard data
 const getDashboardData = async (req, res) => {
     try {
+        await checkDBConnection();
         const bookings = await Booking.find({ isPaid: true });
         const activeShows = await Show.find({ showDateTime: { $gte: new Date() } }).populate("movie");
         const totalUsers = await User.countDocuments() - 1; // Exclude the admin user
@@ -31,6 +33,7 @@ const getDashboardData = async (req, res) => {
 // API endpoint to get all the upcoming shows
 const getAllShows = async (req, res) => {
     try {
+        await checkDBConnection();
         const shows = await Show.find({ showDateTime: { $gte: new Date() } }).populate("movie").sort({ showDateTime: 1 });
         res.json({ success: true, shows });
     } catch (error) {
@@ -42,6 +45,7 @@ const getAllShows = async (req, res) => {
 // API endpoint to get all past shows
 const getAllPastShows = async (req, res) => {
     try {
+        await checkDBConnection();
         const shows = await Show.find({ showDateTime: { $lt: new Date() } }).populate("movie").sort({ showDateTime: -1 });
         res.json({ success: true, shows });
     } catch (error) {
@@ -53,6 +57,7 @@ const getAllPastShows = async (req, res) => {
 // API endpoint to get all bookings
 const getAllBookings = async (req, res) => {
     try {
+        await checkDBConnection();
         const bookings = await Booking.find().populate("user").populate({
             path: "show",
             populate: {

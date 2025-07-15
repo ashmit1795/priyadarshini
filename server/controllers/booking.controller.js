@@ -4,9 +4,11 @@ import Booking from "../models/booking.model.js";
 import Show from "../models/show.model.js";
 import { Cashfree, CFEnvironment } from "cashfree-pg"; 
 import { inngest } from "../inngest/index.js";
+import checkDBConnection from "../utils/checkDBConnection.js";
 
 const createBooking = async (req, res) => {
     try {
+        await checkDBConnection();
         const { userId } = req.auth();
         const { showId, selectedSeats } = req.body;
         const { origin } = req.headers;
@@ -63,6 +65,7 @@ const createBooking = async (req, res) => {
 
 const getOccupiedSeats = async (req, res) => {
     try {
+        await checkDBConnection();
         const { showId } = req.params;
         const show = await Show.findById(showId);
 
@@ -77,6 +80,7 @@ const getOccupiedSeats = async (req, res) => {
 
 const verifyPayment = async (req, res) => { 
     try {
+        await checkDBConnection();
 		const { bookingId } = req.params;
 		const cashfree = new Cashfree(CFEnvironment.SANDBOX, CASHFREE_APP_ID, CASHFREE_SECRET_KEY);
 
@@ -140,6 +144,7 @@ const verifyPayment = async (req, res) => {
 
 const completeBooking = async (req, res) => {
     try {
+        await checkDBConnection();
         const cashfree = new Cashfree(CFEnvironment.SANDBOX, CASHFREE_APP_ID, CASHFREE_SECRET_KEY);
 		// Step 1: Fetch order details
 		const orderResponse = await cashfree.PGFetchOrder(req.params.bookingId);
@@ -170,6 +175,7 @@ const completeBooking = async (req, res) => {
 
 const verifyBooking = async (req, res) => {
     try {
+        await checkDBConnection();
         const { token } = req.params;
         const booking = await Booking.findOne({ qrToken: token, isPaid: true }).populate({
             path: "show",
@@ -224,6 +230,7 @@ export { createBooking, getOccupiedSeats, verifyPayment, completeBooking, verify
 const checkSeatsAvailability = async (showId, selectedSeats) => {
     // selectedSeats is an array of seat identifiers (e.g., ["A1", "A2"])
     try {
+        await checkDBConnection();
         const show = await Show.findById(showId);
         if (!show) return false;
 
@@ -239,7 +246,8 @@ const checkSeatsAvailability = async (showId, selectedSeats) => {
 
 // Utility function to initiate cashfree payment
 const initiateCashfreePayment = async (bookingId, userId, origin) => {
-	try {
+    try {
+        await checkDBConnection();
 		const booking = await Booking.findById(bookingId).populate("show");
         const show = await Show.findById(booking.show).populate("movie");
         const user = await User.findById(userId);

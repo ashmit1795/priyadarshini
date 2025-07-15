@@ -1,8 +1,10 @@
 import { SENDER_EMAIL } from "../config/env.js";
 import sendEmail from "../config/nodemailer.js";
+import checkDBConnection from "../utils/checkDBConnection.js";
 
 const contactUs = async (req, res) => { 
     try {
+        await checkDBConnection();
         const { name, email, message } = req.body;
 
         // Validate input
