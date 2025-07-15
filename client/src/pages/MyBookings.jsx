@@ -135,33 +135,47 @@ function MyBookings() {
 				<div className="text-center text-gray-500 py-20">No bookings found.</div>
 			)}
 			{showModal && selectedBooking && (
-				<div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-					<div className="bg-zinc-900 text-white rounded-xl shadow-xl p-6 max-w-lg w-full relative animate-fade-in">
-						{/* <button className="absolute top-3 right-3 text-gray-400 hover:text-white text-xl">×</button> */}
+				<div
+					className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/70 backdrop-blur-sm"
+				>
+					{/* ▸ modal container */}
+					<div
+						className="relative w-full max-w-lg sm:max-w-md bg-zinc-900 text-white rounded-xl shadow-xl px-6 py-5 sm:p-6 max-h-[90vh] overflow-y-auto animate-fade-in"
+					>
+						{/* close icon */}
 						<XIcon
 							className="absolute top-3 right-3 w-6 h-6 cursor-pointer text-gray-400 hover:text-white"
 							onClick={() => setShowModal(false)}
 						/>
 
-						<h2 className="text-xl font-bold mb-2">{selectedBooking.show.movie.title}</h2>
-						<p className="text-sm mb-1">{dateFormat(selectedBooking.show.showDateTime)}</p>
-						<p className="text-sm mb-1">{timeFormat(selectedBooking.show.movie.runtime)}</p>
-						<p className="text-sm mb-2">Seats: {selectedBooking.bookedSeats.join(", ")}</p>
-						{!selectedBooking.isPaid &&<p className="text-sm mb-4">Amount: ₹{selectedBooking.amount}</p>}
+						{/* content */}
+						<h2 className="text-lg sm:text-xl font-bold mb-2">{selectedBooking.show.movie.title}</h2>
+
+						<div className="text-sm space-y-1 mb-3">
+							<p>{dateFormat(selectedBooking.show.showDateTime)}</p>
+							<p>{timeFormat(selectedBooking.show.movie.runtime)}</p>
+							<p>Seats: {selectedBooking.bookedSeats.join(", ")}</p>
+							{!selectedBooking.isPaid && <p>Amount: ₹{selectedBooking.amount}</p>}
+						</div>
 
 						{selectedBooking.isPaid ? (
 							<>
-								{/* ✅ Show QR code if paid */}
+								{/* QR */}
 								<div className="flex justify-center mt-4">
-									<QRCodeSVG value={selectedBooking.qrToken} size={200} bgColor={"#ffffff"} fgColor={"#000000"} level={"H"} />
+									<QRCodeSVG
+										value={selectedBooking.qrToken}
+										size={180} /* slightly smaller on mobile */
+										bgColor="#ffffff"
+										fgColor="#000000"
+										level="H"
+									/>
 								</div>
 								<p className="text-xs text-center mt-4 text-gray-400">
-									Show this QR at entry. Valid 1 hour before showtime until the show ends.
+									Show this QR at entry. Valid 1h before showtime until the show ends.
 								</p>
 							</>
 						) : (
 							<>
-								{/* ❌ Not Paid → show warning and Pay Now button */}
 								<p className="text-sm text-red-400 font-medium mt-4 text-center">
 									⚠️ Booking not completed. Complete payment to confirm your seat.
 								</p>
@@ -173,7 +187,7 @@ function MyBookings() {
 											setShowModal(false);
 											completeBooking(selectedBooking);
 										}}
-										className="bg-primary hover:bg-primary-dull px-6 py-2 text-sm rounded-full font-medium cursor-pointer"
+										className="bg-primary hover:bg-primary-dull px-6 py-2 text-sm rounded-full font-medium"
 									>
 										Pay Now
 									</button>
