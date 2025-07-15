@@ -12,7 +12,7 @@ const getDashboardData = async (req, res) => {
     try {
         const bookings = await Booking.find({ isPaid: true });
         const activeShows = await Show.find({ showDateTime: { $gte: new Date() } }).populate("movie");
-        const totalUsers = await User.countDocuments();
+        const totalUsers = await User.countDocuments() - 1; // Exclude the admin user
 
         const dashboardData = {
             totalBookings: bookings.length,
