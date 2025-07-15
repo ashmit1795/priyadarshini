@@ -16,7 +16,7 @@ function Dashboard() {
         totalBookings: 0,
         totalRevenue: 0,
         activeShows: [],
-        totalUser: 0
+        totalUsers: 0
     });
 
     const [loading, setLoading] = useState(true);
@@ -39,7 +39,7 @@ function Dashboard() {
 		},
 		{
 			title: "Total Users",
-			value: dashboardData.totalUser || "0",
+			value: dashboardData.totalUsers || "0",
 			icon: UserIcon,
 		},
 	];
