@@ -74,7 +74,7 @@ function ContactUs() {
 					rows={5}
 					className="w-full p-3 rounded bg-gray-800 border border-gray-700"
 				></textarea>
-				{sending ? <button type="submit" className="px-6 py-3 rounded-full bg-primary hover:bg-primary-dull font-medium">
+				{!sending ? <button type="submit" className="px-6 py-3 rounded-full bg-primary hover:bg-primary-dull font-medium">
 					Send Message
 				</button> : <Loader className="w-6 h-6 animate-spin text-primary" />}
 			</form>
