@@ -16,6 +16,10 @@ import useAppContext from "./hooks/useAppContext.js";
 import { SignIn } from "@clerk/clerk-react";
 import VerifyBooking from "./pages/admin/VerifyBooking.jsx";
 import PastShows from "./pages/admin/PastShows.jsx";
+import AboutUs from "./pages/AboutUs.jsx";
+import TermsAndConditions from "./pages/TermsAndConditions.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
+import ContactUs from "./pages/ContactUs.jsx";
 
 
 function App() {
@@ -35,6 +39,10 @@ function App() {
 				<Route path="/movies/:id/:date" element={<SeatLayout />} />
 				<Route path="/favorite" element={<Favorite />} />
 				<Route path="/my-bookings" element={<MyBookings />} />
+				<Route path="/about-us" element={<AboutUs />} />
+				<Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+				<Route path="/privacy-policy" element={<PrivacyPolicy />} />
+				<Route path="/contact-us" element={<ContactUs />} />
 				<Route path="/loading/:nextUrl" element={<Loading />} />
 				<Route
 					path="/admin/*"
