@@ -67,7 +67,7 @@ function VerifyBooking() {
 							<span className="text-gray-400">Movie:</span> {result.data.data.movie}
 						</p>
 						<p>
-							<span className="text-gray-400">Seats:</span> {result.data.data.seats.join(", ")}
+							<span className="text-gray-400">Seats:</span> {result.data.data.bookedSeats.join(", ")}
 						</p>
 						<p>
 							<span className="text-gray-400">Customer Name:</span> {result.data.data.user}
