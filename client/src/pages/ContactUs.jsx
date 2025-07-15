@@ -2,9 +2,11 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import useAppContext from "../hooks/useAppContext";
 import { BlurCircle } from "../components";
+import { Loader } from "lucide-react";
 
 function ContactUs() {
     const { axios, user } = useAppContext();
+    const [sending, setSending] = useState(false);
 
 	const [formData, setFormData] = useState({
 		name: user.fullName || "",
@@ -19,18 +21,21 @@ function ContactUs() {
 	};
 
 	const handleSubmit = async (e) => {
-		e.preventDefault();
+        e.preventDefault();
+        setSending(true);
 		try {
 			const { data } = await axios.post("/contact/", formData);
 			if (data.success) {
 				toast.success("Message sent successfully!");
-				setFormData({ message: "" });
+                setFormData({ message: "" });
 			} else {
-				toast.error(data.message || "Failed to send message");
-			}
+                toast.error(data.message || "Failed to send message");
+            }
+            setSending(false);
 		} catch (err) {
 			console.error(err);
-			toast.error("Something went wrong");
+            toast.error("Something went wrong");
+            setSending(false);
 		}
 	};
 
@@ -69,9 +74,9 @@ function ContactUs() {
 					rows={5}
 					className="w-full p-3 rounded bg-gray-800 border border-gray-700"
 				></textarea>
-				<button type="submit" className="px-6 py-3 rounded-full bg-primary hover:bg-primary-dull font-medium">
+				{sending ? <button type="submit" className="px-6 py-3 rounded-full bg-primary hover:bg-primary-dull font-medium">
 					Send Message
-				</button>
+				</button> : <Loader className="w-6 h-6 animate-spin text-primary" />}
 			</form>
 		</div>
 	);
