@@ -21,9 +21,11 @@ const transporter = nodemailer.createTransport({
 // 		},
 // });
 
-const sendEmail = async ({ to, subject, body}) => {
+const sendEmail = async ({ to, subject, body, fromAlias = "" }) => {
+    const fromAddress = fromAlias ? appendAlias(SENDER_EMAIL, fromAlias) : SENDER_EMAIL;
+    // Send the email
     const response = await transporter.sendMail({
-        from: SENDER_EMAIL,
+        from: fromAddress,
         to,
         subject,
         html: body
@@ -32,3 +34,9 @@ const sendEmail = async ({ to, subject, body}) => {
 }
 
 export default sendEmail;
+
+// Utility function to append alias to email address
+function appendAlias(email, alias) {
+	const [local, domain] = email.split("@");
+	return `${local}${alias}@${domain}`;
+}
