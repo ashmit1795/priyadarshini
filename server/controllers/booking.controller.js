@@ -207,6 +207,7 @@ const verifyBooking = async (req, res) => {
             user: booking.user.name,
             movie: booking.show.movie.title,
             showTime: booking.show.showDateTime,
+            bookedSeats: booking.bookedSeats,
         }
 
         return res.status(200).json({ success: true, message: "Booking verified successfully", data });
