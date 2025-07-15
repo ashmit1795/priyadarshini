@@ -6,7 +6,6 @@ import mongoose from "mongoose";
 import connectDB from "../db/db.js";
 import sendEmail from "../config/nodemailer.js";
 import { LOGO_URL, WEBSITE_URL } from "../config/env.js";
-import { use } from "react";
 import Movie from "../models/movie.model.js";
 
 // Create a client to send and receive events
@@ -211,7 +210,8 @@ const sendBookingConfirmationMail = inngest.createFunction(
 		await sendEmail({
 			to: booking.user.email,
 			subject: `🎬 Booking Confirmed: Enjoy ${booking.show.movie.title} at Priyadarshini!`,
-			body: emailTemplate
+            body: emailTemplate,
+            fromAlias: "+bookings"
 		});
 	}
 );
@@ -338,7 +338,8 @@ const sendReminders = inngest.createFunction(
                         showTime: task.showTime,
                         websiteUrl: WEBSITE_URL,
                         logoUrl: LOGO_URL
-                    })
+                    }),
+                    fromAlias: "+shows"
                 }))
             );
         });
@@ -453,7 +454,8 @@ const sendNewShowNotifications = inngest.createFunction(
 					description: movie.overview,
 					websiteUrl: WEBSITE_URL,
 					logoUrl: LOGO_URL,
-				}),
+                }),
+                fromAlias: "+shows"
 			});
         }
 
@@ -571,6 +573,7 @@ const sendPaymentPendingEmail = inngest.createFunction(
                 websiteUrl: WEBSITE_URL,
                 logoUrl: LOGO_URL
             }),
+            fromAlias: "+bookings"
         });
     }
 );
