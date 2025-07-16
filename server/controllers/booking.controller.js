@@ -197,9 +197,23 @@ const verifyBooking = async (req, res) => {
         const showEndTime = new Date(showStartTime.getTime() + booking.show.movie.runtime * 60000);
         const validFrom = new Date(showStartTime.getTime() - 60 * 60000); // 1 hour before showtime
 
-        if(now < validFrom) {
-            return res.json({ success: false, message: "Ticket is not valid at this time, ticket is valid from " + validFrom.toLocaleString() });
-        }
+        if (now < validFrom) {
+			return res.json({
+				success: false,
+				message:
+					"Ticket is not valid at this time. Ticket is valid from " +
+					validFrom.toLocaleString("en-IN", {
+						timeZone: "Asia/Kolkata",
+						hour: "2-digit",
+						minute: "2-digit",
+						day: "numeric",
+						month: "short",
+						year: "numeric",
+						hour12: true,
+					}),
+			});
+		}
+
 
         if(now > showEndTime) {
             return res.json({ success: false, message: "Ticket is expired" });
