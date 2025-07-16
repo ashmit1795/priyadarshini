@@ -10,13 +10,13 @@ function HeroSection() {
 
 			<h1 className="z-10 text-5xl md:text-[70px] md:leading-18 font-semibold max-w-110">
 				Welcome to <br />
-				<span className="text-[#f30e0e]">P</span>riyadarshini<span className="text-[#f30e0e]">.</span>
+				<span className="text-primary">P</span>riyadarshini<span className="text-primary">.</span>
 			</h1>
 			<p className="z-10  max-wd-md text-gray-300">
 				Book the Magic
-				<span className="text-[#f30e0e]">. </span>
+				<span className="text-primary">. </span>
 				Live the Moment
-				<span className="text-[#f30e0e]">.</span>
+				<span className="text-primary">.</span>
 			</p>
 			<button
 				onClick={() => navigate("/movies")}
