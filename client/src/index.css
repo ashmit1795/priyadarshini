@@ -5,8 +5,9 @@
 @custom-variant hover (&:hover);
 
 @theme{
-    --color-primary: #F84565;
-    --color-primary-dull: #D63854;
+    /* --color-primary: #F84565; */
+    --color-primary: #F30E0E;
+    --color-primary-dull: #B30A0A;
 }
 
 @keyframes fade-in {
