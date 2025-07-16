@@ -1,6 +1,7 @@
 import React from "react";
 import { assets } from "../../assets/assets";
 import { Link } from "react-router-dom";
+import { MailIcon, PhoneCallIcon } from "lucide-react";
 
 function Footer() {
 	const footerLinks = [
@@ -42,8 +43,14 @@ function Footer() {
 					<div>
 						<h2 className="font-semibold mb-5">Get in touch</h2>
 						<div className="text-sm space-y-2">
-							<p>+91-8480476322</p>
-							<p>ashmitpatra77@gmail.com</p>
+							<div className="flex items-center gap-2">
+								<PhoneCallIcon className="w-3.5 h-3.5 inline-block mr-1" />
+								<p>+91-8480476322</p>
+							</div>
+							<div className="flex items-center gap-2">
+								<MailIcon className="w-3.5 h-3.5 inline-block mr-1" />
+								<p>priyadarshini.cinema+contact@gmail.com</p>
+							</div>
 						</div>
 					</div>
 				</div>
