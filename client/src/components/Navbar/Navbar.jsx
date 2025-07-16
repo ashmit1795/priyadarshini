@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { assets } from "../../assets/assets.js";
 import { MenuIcon, SearchIcon, TicketPlus, User, XIcon } from "lucide-react";
 import { useState } from "react";
-import { SignedIn, SignedOut, SignInButton, useClerk, UserButton, useUser } from "@clerk/clerk-react";
+import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import useAppContext from "../../hooks/useAppContext.js";
 
 function Navbar() {
@@ -15,8 +15,10 @@ function Navbar() {
 
 	return (
 		<div className="fixed top-0 z-50 w-full flex items-center justify-between px-6 md:px-16 lg:px-36 py-5">
-			<Link to="/" className="min-md:px-6 py-3 border-0 rounded-full backdrop-blur max-md:flex-1">
-				<img src={assets.logo} alt="logo" className="w-36 h-auto" />
+			<Link to="/" className="min-md:px-6 border-0 py-3 max-md:flex-1">
+				<div className="inline-block p-2 rounded-full backdrop-blur">
+					<img src={assets.logo} alt="logo" className="w-36 h-auto" />
+				</div>
 			</Link>
 
 			<div
@@ -43,18 +45,17 @@ function Navbar() {
 				>
 					Movies
 				</Link>
-				{
-					isAdmin && (
-						<Link
-							className="text-primary"
-							onClick={() => {
-								scrollTo(0, 0);
-								setIsOpen(false);
-							}}
-							to="/admin"
-						>
-							Admin
-						</Link>
+				{isAdmin && (
+					<Link
+						className="text-primary"
+						onClick={() => {
+							scrollTo(0, 0);
+							setIsOpen(false);
+						}}
+						to="/admin"
+					>
+						Admin
+					</Link>
 				)}
 				{/* <Link onClick={() => {scrollTo(0,0); setIsOpen(false)}} to="/"> 
                     Theaters
@@ -76,8 +77,7 @@ function Navbar() {
 				)}
 			</div>
 
-			<div className=" min-md:px-6 py-3 border-0 rounded-full backdrop-blur flex items-center gap-8">
-				<SearchIcon className="max-md:hidden w-6 h-6 cursor-pointer" />
+			<div className=" min-md:px-6 py-3 border-0 rounded-full flex items-center gap-8">
 				{!user ? (
 					<button
 						onClick={openSignIn}
