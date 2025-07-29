@@ -113,7 +113,8 @@ function AddShows() {
                 setSelectedMovie(null);
                 setDateTimeSelection({});
                 setShowPrice("");
-                setDateTimeInput("");
+				setDateTimeInput("");
+				setMovieTrailer("");
             }
         } catch (error) {
             console.error("Error adding show:", error);
