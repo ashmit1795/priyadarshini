@@ -28,11 +28,13 @@ const getAllMoviesTrailers = async (req, res) => {
             const title = show.movie.title;
             if (!seenTitles.has(title)) {
                 seenTitles.add(title);
-                uniqueTrailers.push({
-                    _id: show.movie._id,
-                    title: show.movie.title,
-                    trailer: show.movie.trailer
-                });
+                if(show.movie.trailer) {
+                    uniqueTrailers.push({
+                        _id: show.movie._id,
+                        title: show.movie.title,
+                        trailer: show.movie.trailer
+                    });
+                }
             }
         }
 
