@@ -10,7 +10,7 @@ const getAllMovies = async (req, res) => {
         res.json({ success: true, movies });
     } catch (error) {
         console.error("Error fetching movies:", error.message);
-        res.status(500).json({ success: false, message: error.message });
+        res.json({ success: false, message: error.message });
     }
 }
 
@@ -41,7 +41,7 @@ const getAllMoviesTrailers = async (req, res) => {
         res.json({ success: true, trailers: uniqueTrailers });
     } catch (error) {
         console.error("Error fetching trailers:", error.message);
-        res.status(500).json({ success: false, message: error.message });
+        res.json({ success: false, message: error.message });
     }
 }
 

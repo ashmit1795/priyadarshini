@@ -18,11 +18,11 @@ const getUserBookings = async (req, res) => {
                 }
             }).sort({ createdAt: -1 });
         
-        res.status(200).json({ success: true, bookings });
+        res.json({ success: true, bookings });
     } catch (error) {
         console.error("Error fetching user bookings:", error.message);
-        res.status(500).json({ success: false, error: error.message });
-        
+        res.json({ success: false, message: error.message });
+
     }
 }
 
@@ -34,11 +34,10 @@ const getUser = async (req, res) => {
         if (!user) {
             return res.json({ success: false, message: "User not found" });
         }
-        res.status(200).json({ success: true, user });
+        res.json({ success: true, user });
     } catch (error) {
         console.error("Error fetching user:", error.message);
-        res.status(500).json({ success: false, message: error.message });
-        
+        res.json({ success: false, message: error.message });
     }
 }
 
@@ -67,10 +66,10 @@ const updateFavoriteMovie = async (req, res) => {
             privateMetadata: user.privateMetadata
         });
 
-        res.status(200).json({ success: true, message });
+        res.json({ success: true, message });
     } catch (error) {
         console.error("Error updating favorite movie:", error.message);
-        res.status(500).json({ success: false, error: error.message });
+        res.json({ success: false, message: error.message });
     }
 }
 
@@ -84,10 +83,10 @@ const getFavoriteMovies = async (req, res) => {
 
         // Fetch movie details from the database
         const movies = await Movie.find({ _id: { $in: favoriteMovies } });
-        res.status(200).json({ success: true, favoriteMovies: movies });
+        res.json({ success: true, favoriteMovies: movies });
     } catch (error) {
         console.error("Error fetching favorite movies:", error.message);
-        res.status(500).json({ success: false, error: error.message });
+        res.json({ success: false, message: error.message });
     }
 }
 

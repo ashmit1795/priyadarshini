@@ -9,7 +9,7 @@ const contactUs = async (req, res) => {
 
         // Validate input
         if (!name || !email || !message) {
-            return res.status(400).json({ success: false, message: "All fields are required." });
+            return res.json({ success: false, message: "All fields are required." });
         }
 
         // Send email using the sendEmail function from nodemailer config
@@ -30,10 +30,10 @@ const contactUs = async (req, res) => {
             displayName: "Priyadarshini Contact"
         });
 
-        return res.status(200).json({ success: true, message: "Message sent successfully." });
+        return res.json({ success: true, message: "Message sent successfully." });
     } catch (error) {
         console.error("Error in contactUs controller:", error);
-        return res.status(500).json({ success: false, message: "Internal server error." });
+        return res.json({ success: false, message: "Internal server error." });
     }
 }
 

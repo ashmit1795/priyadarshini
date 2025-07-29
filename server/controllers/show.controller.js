@@ -79,10 +79,10 @@ const getNowPlayingMovies = async (req, res) => {
 			const movies = JSON.parse(cachedData);
 
 			console.log("Serving cached data due to API failure.");
-            res.status(200).json({ success: true, movies,  message: `Serving cached data due to API failure due to: ${error.message}` });
+            res.json({ success: true, movies,  message: `Serving cached data due to API failure due to: ${error.message}` });
 		} catch (cacheErr) {
 			console.error("Cache read failed:", cacheErr.message);
-			res.status(500).json({ success: false, error: error.message, message: "TMDB API and cache both failed"});
+			res.json({ success: false, error: error.message, message: "TMDB API and cache both failed"});
 		}
 	}
 }
@@ -110,7 +110,7 @@ const addShows = async (req, res) => {
 
 			// Check if the movieTrailer url is valid
 			if (movieTrailer && !isValidYouTubeTrailerUrl(movieTrailer)) {
-				return res.status(400).json({ success: false, message: "Invalid YouTube trailer URL" });
+				return res.json({ success: false, message: "Invalid YouTube trailer URL" });
 			}
 
 			// If movie not found, fetch movie details and credits from TMDB and save to DB
@@ -183,7 +183,7 @@ const addShows = async (req, res) => {
 		res.json({success: true, message: "Shows added successfully", movieId, showsCount: shows.length });
 	} catch (error) {
 		console.error("Error adding show:", error.message);
-		res.status(500).json({ success: false, message: error.message });
+		res.json({ success: false, message: error.message });
 	}
 }
 
@@ -198,7 +198,7 @@ const getShows = async (req, res) => {
 		res.json({ success: true, shows: Array.from(uniqueShows) });
 	} catch (error) {
 		console.error("Error fetching shows:", error.message);
-		res.status(500).json({ success: false, message: error.message });
+		res.json({ success: false, message: error.message });
 	}
 }
 
@@ -238,7 +238,7 @@ const getShowsForMovie = async (req, res) => {
 		res.json({ success: true, movie, dateTime });
 	} catch (error) {
 		console.error("Error fetching shows for movie:", error.message);
-		res.status(500).json({ success: false, message: error.message });
+		res.json({ success: false, message: error.message });
 	}
 }
 

@@ -26,7 +26,7 @@ const getDashboardData = async (req, res) => {
         res.json({ success: true, dashboardData });
     } catch (error) {
         console.error("Error getting dashboard data:", error.message);
-        res.status(500).json({ success: false, message: error.message });
+        res.json({ success: false, message: error.message });
     }
 }
 
@@ -38,7 +38,7 @@ const getAllShows = async (req, res) => {
         res.json({ success: true, shows });
     } catch (error) {
         console.error("Error getting all shows:", error.message);
-        res.status(500).json({ success: false, message: error.message });
+        res.json({ success: false, message: error.message });
     }
 };
 
@@ -50,7 +50,7 @@ const getAllPastShows = async (req, res) => {
         res.json({ success: true, shows });
     } catch (error) {
         console.error("Error getting all past shows:", error.message);
-        res.status(500).json({ success: false, message: error.message });
+        res.json({ success: false, message: error.message });
     }
 }
 
@@ -68,7 +68,7 @@ const getAllBookings = async (req, res) => {
         res.json({ success: true, bookings });
     } catch (error) {
         console.error("Error getting all bookings:", error.message);
-        res.status(500).json({ success: false, error: error.message });
+        res.json({ success: false, message: error.message });
     }
 };
 

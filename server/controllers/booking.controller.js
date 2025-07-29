@@ -16,7 +16,7 @@ const createBooking = async (req, res) => {
         // Check if the selected seats are available
         const isAvailable = await checkSeatsAvailability(showId, selectedSeats);
         if (!isAvailable) {
-            return res.status(400).json({ success: false, error: "Selected seats are not available." });
+            return res.json({ success: false, message: "Selected seats are not available." });
         }
 
         // Get the show details
@@ -52,14 +52,14 @@ const createBooking = async (req, res) => {
         });
 
         if (response.success) {
-            return res.status(201).json({ success: true, sessionId: response.sessionId });
+            return res.json({ success: true, sessionId: response.sessionId });
         } else {
-            return res.status(500).json({ success: false, message: response.message });
+            return res.json({ success: false, message: response.message });
         }
 
     } catch (error) {
         console.error("Error creating booking:", error);
-        return res.status(500).json({ success: false, message: error.message });
+        return res.json({ success: false, message: error.message });
     }
 }
 
@@ -71,10 +71,10 @@ const getOccupiedSeats = async (req, res) => {
 
         const occupiedSeats = Object.keys(show.occupiedSeats);
 
-        return res.status(200).json({ success: true, occupiedSeats });
+        return res.json({ success: true, occupiedSeats });
     } catch (error) {
         console.error("Error getting occupied seats:", error.message);
-        return res.status(500).json({ success: false, error: error.message });
+        return res.json({ success: false, message: error.message });
     }
 }
 
@@ -137,7 +137,7 @@ const verifyPayment = async (req, res) => {
 		}
 	} catch (error) {
 		console.error("Error verifying payment:", error);
-		return res.status(500).json({ success: false, message: error.message });
+		return res.json({ success: false, message: error.message });
 	}
     
 }
@@ -163,13 +163,13 @@ const completeBooking = async (req, res) => {
 		// Step 3: Use the payment_session_id for payment
 		const paymentSessionId = orderData.payment_session_id;
 		if (paymentSessionId) {
-			return res.status(201).json({ success: true, sessionId: paymentSessionId });
+			return res.json({ success: true, sessionId: paymentSessionId });
 		} else {
-			return res.status(500).json({ success: false, message: "Failed to create payment session" });
+			return res.json({ success: false, message: "Failed to create payment session" });
 		}
 	} catch (error) {
         console.error("Error completing booking:", error.message);
-        return res.status(500).json({ success: false, message: error.message });
+        return res.json({ success: false, message: error.message });
     }
 }
 
@@ -230,11 +230,10 @@ const verifyBooking = async (req, res) => {
             bookedSeats: booking.bookedSeats,
         }
 
-        return res.status(200).json({ success: true, message: "Booking verified successfully", data });
+        return res.json({ success: true, message: "Booking verified successfully", data });
     } catch (error) {
         console.error("Error verifying booking:", error.message);
-        res.status(500).json({ success: false, message: error.message });
-        
+        res.json({ success: false, message: error.message });
     }
 }
 
