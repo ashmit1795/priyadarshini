@@ -19,21 +19,31 @@ function MovieDetails() {
 	const getShow = useCallback(
 		async () => {
 			try {
-				const show = shows.find((show) => show._id === id);
-				if (show) {
-					const { data } = await axios.get(`/show/${id}`);
-					if (data.success) {
-						setShow({
-							movie: data.movie,
-							dateTime: data.dateTime,
-						});
-					}
+				// const show = shows.find((show) => show._id === id);
+				// if (show) {
+				// 	const { data } = await axios.get(`/show/${id}`);
+				// 	if (data.success) {
+				// 		setShow({
+				// 			movie: data.movie,
+				// 			dateTime: data.dateTime,
+				// 		});
+				// 	}
+				// }
+				const { data } = await axios.get(`/show/${id}`);
+				if (data.success) {
+					setShow({
+						movie: data.movie,
+						dateTime: data.dateTime,
+					});
+				} else {
+					toast.error(data.message || "Failed to fetch show details");
+					navigate("/movies");
 				}
 			} catch (error) {
 				console.error("Error fetching show details:", error);
 				toast.error("Failed to fetch show details");
 			}
-		}, [shows, id, axios]
+		}, [id, axios, navigate]
 	);
 
 	const handleFavorite = async () => {
@@ -88,8 +98,7 @@ function MovieDetails() {
 						{show.movie.release_date.split("-")[0]}
 					</p>
 					<div className="flex items-center flex-wrap gap-4 mt-4">
-						{
-							show.movie.trailer &&
+						{show.movie.trailer && (
 							<button
 								onClick={() => setIsTrailerOpen(true)}
 								className="flex items-center gap-2 px-7 py-3 text-sm bg-gray-800 hover:bg-gray-900 transition rounded-md font-medium cursor-pointer active:scale-95"
@@ -97,7 +106,7 @@ function MovieDetails() {
 								<PlayCircleIcon className="w-5 h-5" />
 								Watch Trailer
 							</button>
-						}
+						)}
 						<a
 							href="#date-select"
 							className="px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-md font-medium cursor-pointer active:scale-95"
@@ -134,13 +143,15 @@ function MovieDetails() {
 				</div>
 			</div>
 
-			<DateSelect dateTime={show.dateTime} id={id} />
+			{Object.keys(show.dateTime).length ? (
+				<DateSelect dateTime={show.dateTime} id={id} />
+			) : (
+				<p id="date-select" className="text-gray-400 text-lg pt-30 text-center">No shows available for this movie</p>
+			)}
 
 			<p className="text-lg font-medium mt-20 mb-8">You May Also Like</p>
 			<div className="flex flex-wrap max-sm:justify-center gap-8">
-				{shows.slice(0, 4).map((movie, idx) => (
-					movie._id !== id && <MovieCard key={idx} movie={movie} />
-				))}
+				{shows.slice(0, 4).map((movie, idx) => movie._id !== id && <MovieCard key={idx} movie={movie} />)}
 			</div>
 			<div className="flex justify-center mt-20">
 				{shows.length > 4 && (
