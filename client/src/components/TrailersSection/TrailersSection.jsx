@@ -15,7 +15,7 @@ function TrailersSection() {
 		try {
 			const { data } = await axios.get("/movie/trailers");
 			if (data.success) {
-				setTrailers(data.trailers.slice(1));
+				setTrailers(data.trailers);
 				setCurrentTrailer(data.trailers[0]);
 			}
 		} catch (error) {
@@ -40,24 +40,27 @@ function TrailersSection() {
 				)}
 			</div>
 			{trailers.length > 0 && (
-				<div className="group grid grid-cols-4 gap-4 md:gap-8 mt-8 max0w-3xl mx-auto">
-					{trailers.slice(0, 4).map((trailer) => (
-						<div
-							key={trailer._id}
-							onClick={() => setCurrentTrailer(trailer)}
-							className="relative group-hover:not-hover:opacity-50 hover:-translate-y-1 duration-300 transition max-md:h-60 md:max-h-60 cursor-pointer"
-						>
-							<img
-								src={getTrailerThumbnail(trailer.trailer)}
-								alt="trailer thumbnail"
-								className="rounded-lg w-full h-full object-cover brightness-75"
-							/>
-							<PlayCircleIcon
-								strokeWidth={1.6}
-								className="absolute top-1/2 left-1/2 w-5 md:w-8 h-5 md:h-12 transform -translate-x-1/2 -translate-y-1/2"
-							/>
-						</div>
-					))}
+				<div className="group grid grid-cols-4 gap-4 md:gap-8 mt-8 max-w-3xl mx-auto">
+					{trailers.slice(0, 4).map(
+						(trailer) =>
+							trailer._id !== currentTrailer?._id && (
+								<div
+									key={trailer._id}
+									onClick={() => setCurrentTrailer(trailer)}
+									className="relative group-hover:not-hover:opacity-50 hover:-translate-y-1 duration-300 transition max-md:h-60 md:max-h-60 cursor-pointer"
+								>
+									<img
+										src={getTrailerThumbnail(trailer.trailer)}
+										alt="trailer thumbnail"
+										className="rounded-lg w-full h-full object-cover brightness-75"
+									/>
+									<PlayCircleIcon
+										strokeWidth={1.6}
+										className="absolute top-1/2 left-1/2 w-5 md:w-8 h-5 md:h-12 transform -translate-x-1/2 -translate-y-1/2"
+									/>
+								</div>
+							)
+					)}
 				</div>
 			)}
 		</div>
