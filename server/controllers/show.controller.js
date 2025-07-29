@@ -210,6 +210,9 @@ const getShowsForMovie = async (req, res) => {
 		const shows = await Show.find({ movie: movieId, showDateTime: { $gte: new Date() } });
 
 		const movie = await Movie.findById(movieId);
+		if (!movie) {
+			return res.json({ success: false, message: "Movie not found" });
+		}
 		const dateTime = {};
 		/*
 			dateTime is an object where keys are dates in YYYY-MM-DD format
