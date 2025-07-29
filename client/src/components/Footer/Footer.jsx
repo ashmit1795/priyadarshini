@@ -1,4 +1,3 @@
-import React from "react";
 import { assets } from "../../assets/assets";
 import { Link } from "react-router-dom";
 import { MailIcon, PhoneCallIcon } from "lucide-react";
@@ -33,7 +32,7 @@ function Footer() {
 						<ul className="text-sm space-y-2">
 							{footerLinks.map((link, index) => (
 								<li key={index}>
-									<Link to={link.url} className="hover:text-primary transition">
+									<Link onClick={() => scrollTo(0,0)} to={link.url} className="hover:text-primary transition">
 										{link.title}
 									</Link>
 								</li>
