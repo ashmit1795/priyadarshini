@@ -107,6 +107,12 @@ const addShows = async (req, res) => {
 		
 		let movie = await Movie.findById(movieId);
 		if (!movie) {
+
+			// Check if the movieTrailer url is valid
+			if (movieTrailer && !isValidYouTubeTrailerUrl(movieTrailer)) {
+				return res.status(400).json({ success: false, message: "Invalid YouTube trailer URL" });
+			}
+
 			// If movie not found, fetch movie details and credits from TMDB and save to DB
 			const movieDetailsUrl = `https://api.themoviedb.org/3/movie/${movieId}`;
 			const movieCreditsUrl = `https://api.themoviedb.org/3/movie/${movieId}/credits`;
@@ -177,7 +183,7 @@ const addShows = async (req, res) => {
 		res.json({success: true, message: "Shows added successfully", movieId, showsCount: shows.length });
 	} catch (error) {
 		console.error("Error adding show:", error.message);
-		res.status(500).json({ success: false, error: error.message });
+		res.status(500).json({ success: false, message: error.message });
 	}
 }
 
@@ -192,7 +198,7 @@ const getShows = async (req, res) => {
 		res.json({ success: true, shows: Array.from(uniqueShows) });
 	} catch (error) {
 		console.error("Error fetching shows:", error.message);
-		res.status(500).json({ success: false, error: error.message });
+		res.status(500).json({ success: false, message: error.message });
 	}
 }
 
@@ -229,7 +235,7 @@ const getShowsForMovie = async (req, res) => {
 		res.json({ success: true, movie, dateTime });
 	} catch (error) {
 		console.error("Error fetching shows for movie:", error.message);
-		res.status(500).json({ success: false, error: error.message });
+		res.status(500).json({ success: false, message: error.message });
 	}
 }
 
@@ -239,4 +245,19 @@ export { getNowPlayingMovies, addShows, getShows, getShowsForMovie };
 // This function filters out movies that do not have both poster_path and backdrop_path
 function filterMoviesWithPosterAndBackdrop(movies) {
 	return movies.filter((movie) => movie.poster_path && movie.backdrop_path);
+}
+
+// Utility function to check if the trailer's youtube URL is valid
+function isValidYouTubeTrailerUrl(url) {
+	if (typeof url !== "string") return null;
+
+	// Regex handles:
+	//  1. https://www.youtube.com/watch?v=VIDEO_ID
+	//  2. https://youtu.be/VIDEO_ID
+	//  3. https://www.youtube.com/embed/VIDEO_ID
+
+	const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+
+	// return true if match is found, false otherwise
+	return match ? true : false;
 }
