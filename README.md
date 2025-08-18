@@ -100,8 +100,7 @@ A full-fledged MERN stack movie ticket booking application where users can explo
 ![SignIn/SignUp Pop-up](./screenshots/4.png)
 ![Favorite Movies Page](./screenshots/5.png)
 ![Movie Details Page](./screenshots/6.png)
-<video src="./screenshots/7.mp4" controls width="600"></video>
-
+[![Watch the demo](./screenshots/6.png)](https://github.com/ashmit1795/priyadarshini/blob/master/screenshots/7.mp4)
 ![Admin Dashboard](./screenshots/9.png)
 ![Add Shows Page](./screenshots/10.png)
 ![List Shows Page](./screenshots/11.png)
