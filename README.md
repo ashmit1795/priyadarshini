@@ -94,7 +94,22 @@ A full-fledged MERN stack movie ticket booking application where users can explo
 🌍 Multi-theatre system for different regions
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![Hero Section](./screenshots/1.png)
+![Trailers Section](./screenshots/2.png)
+![Movies Page](./screenshots/3.png)
+![SignIn/SignUp Pop-up](./screenshots/4.png)
+![Favorite Movies Page](./screenshots/5.png)
+![Movie Details Page](./screenshots/6.png)
+<video src="./screenshots/7.mp4" controls width="600"></video>
+
+![Admin Dashboard](./screenshots/9.png)
+![Add Shows Page](./screenshots/10.png)
+![List Shows Page](./screenshots/11.png)
+![List Bookings Page](./screenshots/12.png)
+![Past Shows Page](./screenshots/13.png)
+![Booking QR Verification Page](./screenshots/14.png)
+
+
 
 
 ## 🧑‍💻 Author
